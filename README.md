@@ -3,4 +3,4 @@ Welcome to hhotLib!
 
 ## Common plugins
 - DOTween
-- Zenject
+- [Zenject](https://github.com/modesttree/Zenject)
