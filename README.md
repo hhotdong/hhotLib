@@ -10,4 +10,3 @@ Welcome to hhotLib!
 - Unity Addressables
 - [Zenject](https://github.com/modesttree/Zenject)
 - [UniRX](https://github.com/neuecc/UniRx)
-- 
