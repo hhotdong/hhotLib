@@ -1,8 +1,10 @@
 # hhotLib
-Welcome to hhotLib!
+Welcome to hhotLib of Unity3D!
 
 ## Common plugins
+- Save system
 - UI system
+- UpdateManager
 - Object pooling
 - Command factory
 - [DOTween](http://dotween.demigiant.com/)
