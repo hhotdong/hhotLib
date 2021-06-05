@@ -11,6 +11,7 @@ Welcome to hhotLib of Unity3D!
 - UI system
 - Unity Addressables
 - Command factory
+- Sequential logic
 
 ### Optional
 - [Update Manager](https://assetstore.unity.com/packages/tools/utilities/update-manager-53581)
