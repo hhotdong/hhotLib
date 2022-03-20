@@ -59,3 +59,4 @@ sysinfo.txt
 *.unitypackage
 
 /[Aa]ssets/References/
+/[Aa]ssets/References.meta
