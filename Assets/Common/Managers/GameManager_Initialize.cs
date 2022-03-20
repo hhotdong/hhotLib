@@ -21,7 +21,8 @@ namespace hhotLib
 
         protected override void OnAwake()
         {
-            if (CheckNetworkPeriodically) checkNetwork = new CheckNetwork(1.0F);
+            if (CheckNetworkPeriodically)
+                checkNetwork = new CheckNetwork(1.0F);
         }
 
         private void OnEnable()
@@ -31,19 +32,20 @@ namespace hhotLib
 #endif
             {
                 Register();
-                if (SaveLoadSystem.IsInitialized) OnLoad();
+                OnLoad();
             }
         }
 
         private void OnDisable()
         {
             Unregister();
-            if (SaveLoadSystem.IsInitialized) OnSave();
+            OnSave();
         }
 
         protected override void OnStart()
         {
-            if (IsInitialized) return;
+            if (IsInitialized)
+                return;
 
             StartCoroutine(Initialize());
 
@@ -70,7 +72,8 @@ namespace hhotLib
             if (pause)
             {
                 Time.timeScale = 0.0F;
-                if (IsInitialized) SaveLoadSystem.Save();
+                if (IsInitialized)
+                    SaveLoadSystem.Save();
             }
             else
             {
@@ -81,7 +84,8 @@ namespace hhotLib
         private void OnApplicationQuit()
         {
             UnityEngine.Debug.Log($"OnApplicationQuit");
-            if (IsInitialized) SaveLoadSystem.Save();
+            if (IsInitialized)
+                SaveLoadSystem.Save();
         }
     }
 }

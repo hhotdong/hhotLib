@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,7 +11,7 @@ namespace hhotLib.Save
     public sealed class SaveData : ScriptableObject
     {
 #if UNITY_EDITOR
-        public bool IsDebug = false;
+        public bool IsDebug;
 #endif
 
         #region Data Formats
@@ -29,76 +28,54 @@ namespace hhotLib.Save
         [Serializable]
         public class Flag : ISaveDataElement
         {
-            public bool FIRST_LAUNCH;
-            public bool STAR_RATING_COMPLETE;
-            public bool EVENT_PROGRESS_0;
+            public bool FIRST_LAUNCH           = false;
+            public bool STAR_RATING_COMPLETE   = false ;
+            public bool EVENT_PROGRESS_0       = false;
         }
 
         [Serializable]
         public class GameResources : ISaveDataElement
         {
-            public int RESOURCE_GOLD;
-            public int RESOURCE_JEWEL;
+            public int RESOURCE_GOLD   = 0;
+            public int RESOURCE_JEWEL  = 0;
         }
 
         [Serializable]
         public class Store : ISaveDataElement
         {
-            public bool AD_COUPON_SUBSCRIBE_PROGRESS;
-            public bool PACKAGE_0_BUY_PROGRESS;
-            public int AD_COUPON_COUNT;
-            public int NORMAL_BOX_COUNT;
-            public int RARE_BOX_COUNT;
-            public int GOLD_1H_TICKET_COUNT;
-            public int GOLD_6H_TICKET_COUNT;
-            public int GOLD_12H_TICKET_COUNT;
-            public int HEART_1H_TICKET_COUNT;
-            public int HEART_6H_TICKET_COUNT;
-            public int HEART_12H_TICKET_COUNT;
+            public bool AD_COUPON_SUBSCRIBE_PROGRESS  = false;
+            public bool PACKAGE_0_BUY_PROGRESS        = false;
+            public int AD_COUPON_COUNT                = 0;
         }
 
         [Serializable]
         public class Quest : ISaveDataElement
         {
-            public int QUEST_NUMBER;
-            public int QUEST_PROGRESS_VALUE;
-            public bool QUEST_ALERT_STATE;
+            public int QUEST_NUMBER = 0;
+            public int QUEST_PROGRESS_VALUE = 0;
+            public bool QUEST_ALERT_STATE = false;
         }
 
         [Serializable]
         public class Achievement : ISaveDataElement
         {
-            public int UPG_LNDMRK_0_LEVEL;
-            public int UPG_LNDMRK_0_VALUE;
-            public int GET_NORMAL_ANIMAL_LEVEL;
-            public int GET_NORMAL_ANIMAL_VALUE;
-            public int CALL_ALBATROSS_LEVEL;
-            public int CALL_ALBATROSS_VALUE;
-            public int PHOTO_MISSION_LEVEL;
-            public int PHOTO_MISSION_VALUE;
-            public int GET_TOUCH_REWARD_LEVEL;
-            public int GET_TOUCH_REWARD_VALUE;
-            public int USE_TIME_TICKET_LEVEL;
-            public int USE_TIME_TICKET_VALUE;
-            public int LNDMRK_EVOLUTION_LEVEL;
-            public int LNDMRK_EVOLUTION__VALUE;
-            public int OPEN_RARE_ANIMAL_BOX_LEVEL;
-            public int OPEN_RARE_ANIMAL_BOX_VALUE;
+            public int UPG_LNDMRK_0_LEVEL = 0;
+            public int UPG_LNDMRK_0_VALUE = 0;
         }
 
         [Serializable]
         public class Tutorial : ISaveDataElement
         {
-            public bool COMPLETE;
-            public bool TRIGGERED;
+            public bool COMPLETE = false;
+            public bool TRIGGERED = false;
         }
 
         [Serializable]
         public class Animal : ISaveDataElement
         {
-            public int TYPE_IDX;
-            public bool LOCKED;
-            public int UPG_LEVEL;
+            public int TYPE_IDX = 0;
+            public bool LOCKED = false;
+            public int UPG_LEVEL = 0;
         }
 
         #endregion
@@ -160,13 +137,9 @@ namespace hhotLib.Save
             {
                 service = data as T;
                 if (service != null)
-                {
                     return true;
-                }
                 else
-                {
                     return false;
-                }
             }
             else
             {
@@ -187,13 +160,9 @@ namespace hhotLib.Save
 
                 service = data as List<T>;
                 if (service != null)
-                {
                     return true;
-                }
                 else
-                {
                     return false;
-                }
             }
             else
             {

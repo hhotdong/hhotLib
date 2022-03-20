@@ -42,7 +42,7 @@ public static class Debug
 
         if (DebugSettings.Instance.CheckIfDebugTagValid(tag))
         {
-            sb.Append($"[{tag}]::");
+            sb.Append($"[{tag}] ");
             sb.Append(message.ToString());
             UnityEngine.Debug.Log(sb.ToString());
             sb.Clear();
@@ -57,7 +57,7 @@ public static class Debug
 
         if (DebugSettings.Instance.CheckIfDebugTagValid(tag))
         {
-            sb.Append($"[{tag}]::");
+            sb.Append($"[{tag}] ");
             sb.Append(message.ToString());
             UnityEngine.Debug.Log(sb.ToString(), context);
             sb.Clear();
@@ -70,7 +70,7 @@ public static class Debug
         if (string.IsNullOrEmpty(tag))
             tag = DebugTagConstant.Default;
 
-        sb.Append($"[{tag}]::");
+        sb.Append($"[{tag}] ");
         sb.Append(message.ToString());
         UnityEngine.Debug.LogError(sb.ToString());
         sb.Clear();
@@ -82,7 +82,7 @@ public static class Debug
         if (string.IsNullOrEmpty(tag))
             tag = DebugTagConstant.Default;
 
-        sb.Append($"[{tag}]::");
+        sb.Append($"[{tag}] ");
         sb.Append(message.ToString());
         UnityEngine.Debug.LogError(sb.ToString(), context);
         sb.Clear();
@@ -96,7 +96,7 @@ public static class Debug
 
         if (DebugSettings.Instance.CheckIfDebugTagValid(tag))
         {
-            sb.Append($"[{tag}]::");
+            sb.Append($"[{tag}] ");
             sb.Append(message.ToString());
             UnityEngine.Debug.LogWarning(sb.ToString());
             sb.Clear();
@@ -111,7 +111,7 @@ public static class Debug
 
         if (DebugSettings.Instance.CheckIfDebugTagValid(tag))
         {
-            sb.Append($"[{tag}]::");
+            sb.Append($"[{tag}] ");
             sb.Append(message.ToString());
             UnityEngine.Debug.LogWarning(sb.ToString(), context);
             sb.Clear();

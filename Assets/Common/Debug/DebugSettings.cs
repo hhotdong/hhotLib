@@ -111,6 +111,7 @@ public class DebugTag_Temporary
 public static class DebugTagConstant
 {
     public const string Default = "Default";
+    public const string SaveLoad = "SaveLoad";
     public const string Debug = "Debug";
     public const string Test = "Test";
 }

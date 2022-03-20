@@ -57,3 +57,5 @@ sysinfo.txt
 # Builds
 *.apk
 *.unitypackage
+
+/[Aa]ssets/References/
