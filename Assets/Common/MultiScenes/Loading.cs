@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections;
-using UnityEngine;
-using UnityEngine.SceneManagement;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using DG.Tweening;
@@ -12,80 +9,72 @@ namespace hhotLib.Common
     public class Loading : MonoBehaviour
     {
         private CanvasGroup cg;
-        private float m_LoadingProgress;
-        private bool m_IsLoading;
         
         [SerializeField] private Slider m_ProgressBar;
         [SerializeField] private TextMeshProUGUI m_ProgressText;
 
-        private readonly float FADE_DURATION = 0.5f;
-
         private void Awake()
         {
             cg = GetComponent<CanvasGroup>();
-            m_IsLoading = false;
-            SceneLoader.OnStartLoading += StartLoading;
+            cg.alpha = 0.0f;
+            SceneLoader.LoadingStartedEvent += OnLoadingStarted;
+            SceneLoader.LoadingEvent += OnLoading;
+            SceneLoader.LoadingCompletedEvent += OnLoadingCompleted;
+            QueryManager.RegisterProvider<CheckLoadingWindowVisibleRequest, bool>(CheckIfVisible);
+        }
+
+        private bool CheckIfVisible(CheckLoadingWindowVisibleRequest request)
+        {
+            return request.CheckVisible ? cg.enabled && cg.alpha > 0.9999f : !DOTween.IsTweening(cg) && cg.alpha < 0.0001f;
         }
 
         private void OnDestroy()
         {
-            m_IsLoading = false;
-            SceneLoader.OnStartLoading -= StartLoading;
+            cg = null;
+            SceneLoader.LoadingStartedEvent -= OnLoadingStarted;
+            SceneLoader.LoadingEvent -= OnLoading;
+            SceneLoader.LoadingCompletedEvent -= OnLoadingCompleted;
         }
 
-        private void StartLoading(string sceneName, Action callback)
+        private void OnLoadingStarted(string sceneName)
         {
-            if (m_IsLoading)
-                return;
-            m_IsLoading = true;
+            if (DOTween.IsTweening(cg))
+                cg.DOKill();
 
-            StartCoroutine(Load());
-
-            IEnumerator Load()
-            {
-                WillLoading();
-                yield return new WaitForSeconds(0.2f);  // async.allowSceneActivation 의 정상 작동을 위한 딜레이
-                yield return cg.DOFade(1.0f, FADE_DURATION).WaitForCompletion();
-
-                AsyncOperation async = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
-                async.allowSceneActivation = false;
-
-                while (async.progress < 0.9f)
+            cg.DOFade(1.0f, 1.0f)
+                .OnStart(() =>
                 {
-                    LoadingProgress();
-                    yield return null;
-                }
-
-                DidLoading();
-                yield return cg.DOFade(0.0f, FADE_DURATION).WaitForCompletion();
-                callback?.Invoke();
-
-                void WillLoading()
-                {
-                    cg.interactable = true;
                     cg.alpha = 0.0f;
-                    m_LoadingProgress = 0.0f;
                     m_ProgressBar.value = 0.0f;
                     m_ProgressText.text = "0%";
-                }
+                })
+                .Play();
+        }
 
-                void LoadingProgress()
-                {
-                    m_LoadingProgress = Mathf.Clamp01(async.progress / 0.9f);
-                    m_ProgressBar.value = m_LoadingProgress;
-                    m_ProgressText.text = Mathf.Round(m_LoadingProgress * 100.0f).ToString("{0}%");
-                    UnityEngine.Debug.Log($"Loading next scene({sceneName})...{m_LoadingProgress}%");
-                }
+        private void OnLoading(float progress)
+        {
+            progress = Mathf.Clamp01(progress / 0.9f);
+            m_ProgressBar.value = progress;
+            m_ProgressText.text = Mathf.Round(progress * 100.0f).ToString("{0}%");
+            UnityEngine.Debug.Log($"Loading next scene...{progress * 100.0f}%");
+        }
 
-                void DidLoading()
+        private void OnLoadingCompleted(string sceneName)
+        {
+            if (DOTween.IsTweening(cg))
+                cg.DOKill();
+
+            cg.DOFade(0.0f, 1.0f)
+                .OnStart(() =>
                 {
-                    m_LoadingProgress = 1.0f;
                     m_ProgressBar.value = 1.0f;
                     m_ProgressText.text = "100%";
-                    async.allowSceneActivation = true;
-                    m_IsLoading = false;
-                }
-            }
+                })
+                .OnComplete(() =>
+                {
+                    cg.alpha = 0.0f;
+                })
+                .Play();
         }
     }
 }

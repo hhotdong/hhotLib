@@ -21,6 +21,11 @@ namespace hhotLib.Common
             cg.alpha = 0.0f;
         }
 
+        private void OnDestroy()
+        {
+            cg = null;
+        }
+
         private IEnumerator Start()
         {
             yield return new WaitForSeconds(0.2f);  // async.allowSceneActivation 의 정상 작동을 위한 딜레이

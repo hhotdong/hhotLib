@@ -1,6 +1,7 @@
 //https://coffeebraingames.wordpress.com/2017/10/31/simple-query-system/
 
 using UnityEngine;
+using hhotLib.Common;
 
 public class QueryManagerTestProvider : MonoBehaviour
 {

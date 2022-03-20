@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace hhotLib.Common
 {
-    public class AutoSceneLoader : MonoBehaviour
+    public class DependentSceneLoader : MonoBehaviour
     {
         [SerializeField] private List<string> sceneNames;
 
@@ -17,7 +17,7 @@ namespace hhotLib.Common
                 continue;
 #endif
                 SceneLoader.Instance.Load(sceneNames[i], false);
-                yield return new WaitUntil(() => !SceneLoader.IsLoading);
+                yield return new WaitUntil(() => !SceneLoader.Instance.IsLoading);
             }
         }
 

@@ -1,14 +1,17 @@
 using System;
 using System.Collections;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace hhotLib.Common
 {
     public class SceneLoader : Singleton<SceneLoader>
     {
-        public static bool IsLoading { get; private set; }
+        public bool IsLoading { get; private set; }
 
-        public static Action<string, Action> OnStartLoading;
+        public static Action<string> LoadingStartedEvent;
+        public static Action<float> LoadingEvent;
+        public static Action<string> LoadingCompletedEvent;
 
         protected override void OnAwake()
         {
@@ -23,7 +26,7 @@ namespace hhotLib.Common
         public void Load(string sceneName, bool showLoadingScreen, bool activate = false, string unloadSceneName = "")
         {
             var sceneToLoad = SceneManager.GetSceneByName(sceneName);
-            if (sceneToLoad.isLoaded)
+            if (sceneToLoad.IsValid() && sceneToLoad.isLoaded)
             {
                 Debug.LogWarning($"Requested scene({sceneName}) has already been loaded!");
                 return;
@@ -31,45 +34,67 @@ namespace hhotLib.Common
 
             if (IsLoading)
             {
-                Debug.LogWarning("It's already loading scene now!");
+                Debug.LogWarning("Scene is already loading!");
                 return;
             }
             IsLoading = true;
 
-            if (showLoadingScreen)
-            {
-                SceneManager.LoadSceneAsync(SceneName.LOADING, LoadSceneMode.Additive).completed += s =>
-                {
-                    OnStartLoading?.Invoke(sceneName, OnComplete);
-                };
-            }
-            else
-            {
-                SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive).completed += s =>
-                {
-                    OnComplete();
-                };
-            }
+            StartCoroutine(LoadProcess());
 
-            void OnComplete()
+            IEnumerator LoadProcess()
             {
                 if (showLoadingScreen)
-                    SceneManager.UnloadSceneAsync(SceneName.LOADING);
+                {
+                    var asyncLoading = SceneManager.LoadSceneAsync(SceneName.LOADING, LoadSceneMode.Additive);
+                    yield return new WaitUntil(() => asyncLoading.isDone);
+                    LoadingStartedEvent?.Invoke(sceneName);
+                    yield return new WaitUntil(
+                        () => QueryManager.Query<CheckLoadingWindowVisibleRequest, bool>(new CheckLoadingWindowVisibleRequest(true)));
+                }
+                
+                if (!string.IsNullOrEmpty(unloadSceneName))  // 언로드돼야 하는 씬이 있다면 우선 처리한다.
+                {
+                    var unloadedScene = SceneManager.GetSceneByName(unloadSceneName);
+                    if (unloadedScene.IsValid() && unloadedScene.isLoaded)
+                    {
+                        var asyncUnloading = SceneManager.UnloadSceneAsync(unloadSceneName);
+                        yield return new WaitUntil(() => asyncUnloading.isDone);
+                    }
+                }
+
+                var asyncLoadingNext = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
+                yield return new WaitForSeconds(1.0f);
+                asyncLoadingNext.allowSceneActivation = false;
+                while (asyncLoadingNext.progress < 0.9f)
+                {
+                    LoadingEvent?.Invoke(asyncLoadingNext.progress);
+                    yield return null;
+                }
+                asyncLoadingNext.allowSceneActivation = true;
 
                 if (activate)
-                    StartCoroutine(Activate());
+                {
+                    Scene scene = default;
+                    yield return new WaitUntil(() =>
+                    {
+                        scene = SceneManager.GetSceneByName(sceneName);
+                        return scene.IsValid() && scene.isLoaded;
+                    });
+                    SceneManager.SetActiveScene(scene);
+                }
 
-                if (!string.IsNullOrEmpty(unloadSceneName))
-                    SceneManager.UnloadSceneAsync(unloadSceneName);
+                LoadingCompletedEvent?.Invoke(sceneName);
 
+                if (showLoadingScreen)
+                {
+                    yield return new WaitUntil(
+                        () => QueryManager.Query<CheckLoadingWindowVisibleRequest, bool>(new CheckLoadingWindowVisibleRequest(false)));
+                    UnityEditor.EditorApplication.isPaused = true;
+                    SceneManager.UnloadSceneAsync(SceneName.LOADING);
+                }
                 IsLoading = false;
-            }
-
-            IEnumerator Activate()
-            {
-                yield return null;
-                SceneManager.SetActiveScene(sceneToLoad);
             }
         }
     }
 }
+
