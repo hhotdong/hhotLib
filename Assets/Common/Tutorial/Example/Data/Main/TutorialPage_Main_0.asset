@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 982522c41500342f09676221a1a4abe0, type: 3}
+  m_Name: TutorialPage_Main_0
+  m_EditorClassIdentifier: 
+  pageName: MAIN_GET_NEW_VEHICLE
+  toggleActive: 1
+  pauseTime: 0
+  sequentialProgress: 0
+  repetitive: 1
+  prevPageData: {fileID: 0}
+  nextPageData: {fileID: 0}
+  enableTimer: 0
+  timerPeriod: 0
+  enableAction: 1
+  awaitingAction: MAIN_GET_NEW_VEHICLE_COMPLETE
+  key: tuto_main_0
+  tutorialType: 5000
+  complete: 0
