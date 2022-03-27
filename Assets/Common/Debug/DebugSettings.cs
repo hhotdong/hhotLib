@@ -80,7 +80,14 @@ public class DebugSettings : ScriptableObject
 
         var constants = Utils.GetConstants(typeof(DebugTagConstant));
         if (constantTags.Length != constants.Length)
+        {
             Array.Resize(ref constantTags, constants.Length);
+            for (int i = 0; i < constantTags.Length; i++)
+            {
+                if (constantTags[i] == null)
+                    constantTags[i] = new DebugTag();
+            }
+        }
         for (int i = 0; i < constants.Length; i++)
             constantTags[i].TagName = constants[i].Name;
 
@@ -111,7 +118,7 @@ public class DebugTag_Temporary
 public static class DebugTagConstant
 {
     public const string Default = "Default";
-    public const string SaveLoad = "SaveLoad";
+    public const string Save  = "SaveLoad";
     public const string Debug = "Debug";
     public const string Test = "Test";
 }

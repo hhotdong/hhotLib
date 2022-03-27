@@ -38,6 +38,11 @@ namespace hhotLib.Save
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void Initialize()
         {
+            if (IsInitialized)
+            {
+                UnityEngine.Debug.LogError("SaveLoadSystem already initialized!");
+                return;
+            }
             CreateSaveDataContainer();
             s_Savables.Clear();
             IsInitialized = true;
@@ -51,14 +56,12 @@ namespace hhotLib.Save
                 s_SaveDataContainer = null;
             }
 
-#if !UNITY_EDITOR
-            saveDataContainer = ScriptableObject.CreateInstance<SaveData>();
-#else
+#if UNITY_EDITOR
             var saveData = Resources.FindObjectsOfTypeAll<SaveData>();
             if (saveData.Length > 0)
             {
                 var debugData = saveData.Where((data, b) => data.IsDebug);
-                if (debugData.Count<SaveData>() > 0)
+                if (debugData.Count() > 0)
                 {
                     var enumerator = debugData.GetEnumerator();
                     if (enumerator.MoveNext())
@@ -69,10 +72,10 @@ namespace hhotLib.Save
                     }
                 }
                 else
-                    Debug.LogError($"SaveData for debug not found!", DebugTagConstant.SaveLoad);
+                    Debug.LogError($"SaveData for debug not found!", DebugTagConstant.Save);
             }
             else
-                Debug.LogError($"SaveData not found!", DebugTagConstant.SaveLoad);
+                Debug.LogError($"SaveData not found!", DebugTagConstant.Save);
 
             s_SaveDataContainer = ScriptableObject.CreateInstance<SaveData>();
 
@@ -96,6 +99,8 @@ namespace hhotLib.Save
                 AssetDatabase.CreateFolder(FOLDER_PARENT_NAME, FOLDER_NAME);
             string fullPath = Path.Combine(Path.Combine(ROOT_NAME, ASSET_PATH), ASSET_NAME + ASSET_EXTENSION);
             AssetDatabase.CreateAsset(s_SaveDataContainer, fullPath);
+#else
+            saveDataContainer = ScriptableObject.CreateInstance<SaveData>();
 #endif
         }
 
@@ -106,17 +111,20 @@ namespace hhotLib.Save
 
             UnityEngine.Debug.Log($"Load");
 #if UNITY_EDITOR
-            if (!s_SaveDataContainer.IsDebug)  // 에디터에서는 디버그용 세이브 데이터 SO가 있다면 해당 에셋에 설정한 값으로 게임을 시작함.
-#endif
+            if (s_SaveDataContainer.IsDebug)  // 에디터에서는 디버그용 세이브 데이터 SO가 있다면 해당 에셋에 설정한 값으로 게임을 시작함.
             {
-                string saveDataJSON = EncryptedPlayerPrefs.GetString(KEY_SAVE_DATA, "");
-                if (string.IsNullOrEmpty(saveDataJSON))
-                    UnityEngine.Debug.LogWarning("JSON saveData not found!");
-                else
-                {
-                    Debug.Log($"JSON saveData found. App initializes with the following data.\n\n{saveDataJSON}", DebugTagConstant.SaveLoad);
-                    s_SaveDataContainer.LoadFromJson(saveDataJSON);
-                }
+                for (int i = 0; i < s_Savables.Count; i++)
+                    s_Savables[i].OnLoad();
+                return;
+            }
+#endif
+            string saveDataJSON = EncryptedPlayerPrefs.GetString(KEY_SAVE_DATA, "");
+            if (string.IsNullOrEmpty(saveDataJSON))
+                UnityEngine.Debug.LogWarning("JSON saveData not found!");
+            else
+            {
+                Debug.Log($"JSON saveData found. App initializes with the following data.\n\n{saveDataJSON}", DebugTagConstant.Save);
+                s_SaveDataContainer.LoadFromJson(saveDataJSON);
             }
 
             for (int i = 0; i < s_Savables.Count; i++)
@@ -140,7 +148,7 @@ namespace hhotLib.Save
         public static void Register(ISavable savable)
         {
             if (s_Savables.Contains(savable))
-                Debug.LogWarning("This savable already registered!", DebugTagConstant.SaveLoad);
+                Debug.LogWarning("This savable already registered!", DebugTagConstant.Save);
             else
                 s_Savables.Add(savable);
         }
@@ -150,7 +158,7 @@ namespace hhotLib.Save
             if (s_Savables.Contains(savable))
                 s_Savables.Remove(savable);
             else
-                Debug.LogWarning("This savable is not registered!", DebugTagConstant.SaveLoad);
+                Debug.LogWarning("This savable is not registered!", DebugTagConstant.Save);
         }
 
         public static bool CheckIfSavable(object client)
@@ -161,13 +169,13 @@ namespace hhotLib.Save
         public static void Reset()
         {
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            Debug.Log("Reset all save data", DebugTagConstant.SaveLoad);
+            Debug.Log("Reset all save data", DebugTagConstant.Save);
             PlayerPrefs.DeleteAll();
             for (int i = 0; i < s_Savables.Count; i++)
                 s_Savables[i].OnReset();
             Initialize();
 #else
-            UnityEngine.Debug.LogWarning("You tried to remove save data but it's not possible on editor or development build!");
+            UnityEngine.Debug.LogWarning("You tried to remove save data but it's possible only on editor or development build!");
 #endif
         }
 
@@ -185,22 +193,22 @@ namespace hhotLib.Save
                 case PlayModeStateChange.EnteredEditMode:
                     IsInitialized = false;
                     s_Savables.Clear();
-                    Debug.Log($"Enter Edit Mode : Savables({s_Savables.Count}) , IsInitialized({IsInitialized})", DebugTagConstant.SaveLoad);
+                    Debug.Log($"Enter Edit Mode : Savables({s_Savables.Count}) , IsInitialized({IsInitialized})", DebugTagConstant.Save);
                     break;
 
                 case PlayModeStateChange.ExitingEditMode:
                     IsInitialized = false;
                     s_Savables.Clear();
-                    Debug.Log($"Exit Edit Mode : Savables({s_Savables.Count}) , IsInitialized({IsInitialized})", DebugTagConstant.SaveLoad);
+                    Debug.Log($"Exit Edit Mode : Savables({s_Savables.Count}) , IsInitialized({IsInitialized})", DebugTagConstant.Save);
                     break;
 
                 case PlayModeStateChange.EnteredPlayMode:
-                    Debug.Log($"Enter Play Mode : Savables({s_Savables.Count}) , IsInitialized({IsInitialized})", DebugTagConstant.SaveLoad);
+                    Debug.Log($"Enter Play Mode : Savables({s_Savables.Count}) , IsInitialized({IsInitialized})", DebugTagConstant.Save);
                     break;
 
                 case PlayModeStateChange.ExitingPlayMode:
                     Save();
-                    Debug.Log($"Exit Play Mode : Savables({s_Savables.Count}) , IsInitialized({IsInitialized})", DebugTagConstant.SaveLoad);
+                    Debug.Log($"Exit Play Mode : Savables({s_Savables.Count}) , IsInitialized({IsInitialized})", DebugTagConstant.Save);
                     break;
 
                 default:
