@@ -56,6 +56,7 @@ namespace hhotLib
                 yield return null;
 
                 WillCompleteInitialize?.Invoke();
+                DidCompleteInitialize?.Invoke();
 
                 IsInitialized = true;
             }
