@@ -1,28 +1,24 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
-namespace hhotLib
+namespace hhotLib.Common
 {
     public class DestroyOnPlaying : MonoBehaviour
     {
         [SerializeField] private bool destroyWhenNoChildren = false;
 
-        private void Start()
+        private IEnumerator Start()
         {
-            if (!destroyWhenNoChildren)
-                Destroy(this.gameObject);
-        }
+            if (destroyWhenNoChildren == false)
+            {
+                Destroy(gameObject);
+                yield break;
+            }
 
-        private void Update()
-        {
-            if (!destroyWhenNoChildren)
-                Destroy(this.gameObject);
-            else if (transform.childCount == 0 && !IsInvoking())
-                Invoke("DestroyAfterInterval", 1.0f);
-        }
+            while (transform.childCount > 0)
+                yield return null;
 
-        private void DestroyAfterInterval()
-        {
-            Destroy(this.gameObject);
+            Destroy(gameObject);
         }
     }
 }

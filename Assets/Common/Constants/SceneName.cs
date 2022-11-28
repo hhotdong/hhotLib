@@ -1,5 +1,6 @@
-public class SceneName
+public static class SceneName
 {
-    public const string DEBUG = "Debug";
-    public const string LOADING = "Loading";
+    public static readonly string PLAY    = "Play";
+    public static readonly string DEBUG   = "Debug";
+    public static readonly string LOADING = "Loading";
 }

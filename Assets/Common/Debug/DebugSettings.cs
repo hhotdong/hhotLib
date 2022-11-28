@@ -9,9 +9,8 @@ using UnityEditor;
 
 public class DebugSettings : ScriptableObject
 {
-    private const string DebugSettingsDir = "Assets/Editor Default Resources";
-    private const string DebugSettingsFile = "DebugSettings";
-    private const string DebugSettingsFileExtension = ".asset";
+    [SerializeField] private DebugTag[]           constantTags;
+    [SerializeField] private DebugTag_Temporary[] temporaryTags;
 
     private static DebugSettings instance;
     public static DebugSettings Instance
@@ -20,16 +19,18 @@ public class DebugSettings : ScriptableObject
         {
             if (instance != null)
                 return instance;
-
 #if UNITY_EDITOR
-            string assetPath = Path.Combine(DebugSettingsDir, DebugSettingsFile);
-            string assetPathWithExtension = Path.ChangeExtension(assetPath, DebugSettingsFileExtension);
+            const string ASSET_PATH       = "Assets/Editor Default Resources";
+            const string ASSET_FILE_NAME  = "DebugSettings";
+            const string ASSET_FILE_EXT   = ".asset";
+            string assetPath              = Path.Combine(ASSET_PATH, ASSET_FILE_NAME);
+            string assetPathWithExtension = Path.ChangeExtension(assetPath, ASSET_FILE_EXT);
             instance = AssetDatabase.LoadAssetAtPath<DebugSettings>(assetPathWithExtension);
 
             if (instance != null)
                 return instance;
 
-            Directory.CreateDirectory(DebugSettingsDir);
+            Directory.CreateDirectory(ASSET_PATH);
             instance = ScriptableObject.CreateInstance<DebugSettings>();
             AssetDatabase.CreateAsset(instance, assetPathWithExtension);
             AssetDatabase.SaveAssets();
@@ -41,17 +42,19 @@ public class DebugSettings : ScriptableObject
         }
     }
 
-    [SerializeField] private DebugTag[] constantTags;
-    [SerializeField] private DebugTag_Temporary[] temporaryTags;
-
     public bool CheckIfDebugTagValid(string tag)
     {
         for (int i = 0; i < constantTags.Length; i++)
+        {
             if (constantTags[i].TagName == tag && constantTags[i].ShouldDisplay)
                 return true;
+        }
+
         for (int i = 0; i < temporaryTags.Length; i++)
+        {
             if (temporaryTags[i].TagName == tag && temporaryTags[i].ShouldDisplay)
                 return true;
+        }
         return false;
     }
 
@@ -59,8 +62,6 @@ public class DebugSettings : ScriptableObject
     public static void SelectAsset()
     {
 #if UNITY_EDITOR
-        //string assetPath = Path.Combine(DebugSettingsDir, DebugSettingsFile);
-        //string assetPathWithExtension = Path.ChangeExtension(assetPath, DebugSettingsFileExtension);
         Selection.activeObject = Instance;
 #endif
     }
@@ -70,12 +71,12 @@ public class DebugSettings : ScriptableObject
         if (constantTags == null || temporaryTags == null)
             return;
 
-        var groupByTag = constantTags.GroupBy(x => x.TagName.ToUpper());
+        var groupByTag  = constantTags.GroupBy(x => x.TagName.ToUpper());
         var isDuplicate = groupByTag.Any(g => g.Count() > 1);
         if (isDuplicate)
         {
             var duplicateElement = groupByTag.FirstOrDefault(g => g.Count() > 1);
-            Debug.LogError($"Debug tag({duplicateElement.Key}) is duplicated in constantTags!", this, DebugTagConstant.Default);
+            Debug.LogError($"Debug tag({duplicateElement.Key}) is duplicated in constant tags!", this, DebugTagConstant.Default);
         }
 
         var constants = Utils.GetConstants(typeof(DebugTagConstant));
@@ -88,15 +89,16 @@ public class DebugSettings : ScriptableObject
                     constantTags[i] = new DebugTag();
             }
         }
-        for (int i = 0; i < constants.Length; i++)
+
+        for (int i = 0; i < constantTags.Length; i++)
             constantTags[i].TagName = constants[i].Name;
 
-        var _groupByTag = temporaryTags.GroupBy(x => x.TagName.ToUpper());
-        isDuplicate = _groupByTag.Any(g => g.Count() > 1);
+        var groupByTag_temp = temporaryTags.GroupBy(x => x.TagName.ToUpper());
+        isDuplicate = groupByTag_temp.Any(g => g.Count() > 1);
         if (isDuplicate)
         {
-            var duplicateElement = _groupByTag.FirstOrDefault(g => g.Count() > 1);
-            Debug.LogError($"Debug tag({duplicateElement.Key}) is duplicated in temporaryTags!", this, DebugTagConstant.Default);
+            var duplicateElement = groupByTag_temp.FirstOrDefault(g => g.Count() > 1);
+            Debug.LogError($"Debug tag({duplicateElement.Key}) is duplicated in temporary tags!", this, DebugTagConstant.Default);
         }
     }
 }
@@ -118,7 +120,7 @@ public class DebugTag_Temporary
 public static class DebugTagConstant
 {
     public const string Default = "Default";
-    public const string Save  = "SaveLoad";
-    public const string Debug = "Debug";
-    public const string Test = "Test";
+    public const string Save    = "Save";
+    public const string Test    = "Test";
+    public const string Debug   = "Debug";
 }

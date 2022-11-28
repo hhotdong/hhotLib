@@ -1,7 +1,4 @@
-﻿//#if UNITY_EDITOR 
-//#define DEBUG
-//#endif
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 using System;
 using System.Text;

@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 
@@ -11,11 +10,10 @@ namespace hhotLib.Build
 
         public void OnPreprocessBuild(BuildReport report)
         {
-            //if(EditorPrefs.GetBool("OverrideRSD", false))
-            //{
-            //    Resources.Load<Lib.RapidSheetData.RSDAsset>("RSDData").UpdateDataIds();
-            //    Resources.Load<GameManager>("GameManager").FetchAndUpdateData();
-            //}
+            if (EditorPrefs.GetBool("development", false))
+            {
+                // do something before build
+            }
         }
     }
 }

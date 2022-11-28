@@ -1,11 +1,11 @@
-public class PlayerPrefsKeys
+public static class PlayerPrefsKeys
 {
-    public class Setting
+    public static class Setting
     {
-        public const string LANGUAGE                  = "LANGUAGE";
-        public const string QUALITY                   = "QUALITY";
-        public const string TOGGLE_AUDIO              = "TOGGLE_AUDIO";
-        public const string TOGGLE_VIBRATION          = "TOGGLE_VIBRATION";
-        public const string TOGGLE_PUSH_NOTIFICATION  = "TOGGLE_PUSH_NOTIFICATION";
+        public static readonly string LANGUAGE                 = "LANGUAGE";
+        public static readonly string QUALITY                  = "QUALITY";
+        public static readonly string TOGGLE_AUDIO             = "TOGGLE_AUDIO";
+        public static readonly string TOGGLE_VIBRATION         = "TOGGLE_VIBRATION";
+        public static readonly string TOGGLE_PUSH_NOTIFICATION = "TOGGLE_PUSH_NOTIFICATION";
     }
 }

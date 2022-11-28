@@ -1,36 +1,71 @@
+using System;
+using System.Collections;
 using UnityEngine;
-using hhotLib.Save;
 using hhotLib.Common;
 
 namespace hhotLib
 {
-    public partial class GameManager : Singleton<GameManager>, ISavable
+    public class GameManager : Singleton<GameManager>
     {
-        [Header("Common Savables"), Space(5)]
-        public string userID = "";
+        public static bool IsInitialized { get; private set; }
 
-        public void OnLoad()
+        public static float LoadingProgress;
+
+        public static event Action WillCompleteInitialize;
+        public static event Action DidCompleteInitialize;
+
+        [SerializeField] private bool checkNetworkPeriodically;
+
+        private CheckNetwork checkNetwork;
+
+        protected override void OnAwake()
         {
-            if (SaveLoadSystem.SaveDataContainer.TryGetSaveData(this, out SaveData.User user))
-            {
-                userID = user.USER_ID;
-            }
+            if (checkNetworkPeriodically)
+                checkNetwork = new CheckNetwork(1.0F);
         }
 
-        public void OnSave()
+        protected override void OnStart()
         {
-            if (SaveLoadSystem.SaveDataContainer.TryGetSaveData(this, out SaveData.User user))
-            {
-                user.USER_ID = userID;
-            }
+            if (IsInitialized)
+                return;
+
+            StartCoroutine(Initialize());
         }
 
-        public void OnReset()
+        private IEnumerator Initialize()
         {
-            userID = "";
+            LoadingProgress = 0.0f;
+
+            yield return null;
+
+            WillCompleteInitialize?.Invoke();
+
+            DidCompleteInitialize? .Invoke();
+
+            LoadingProgress = 1.0f;
+
+            IsInitialized = true;
         }
 
-        public void Register() => SaveLoadSystem.Register(this);
-        public void Unregister() => SaveLoadSystem.Unregister(this);
+        private void Update()
+        {
+            if (checkNetworkPeriodically)
+                checkNetwork.Update();
+        }
+
+        private void OnApplicationPause(bool pause)
+        {
+            UnityEngine.Debug.Log($"OnApplicationPause : {pause}");
+
+            if (pause)
+                Time.timeScale = 0.0F;
+            else
+                Time.timeScale = 1.0F;
+        }
+
+        private void OnApplicationQuit()
+        {
+            UnityEngine.Debug.Log($"OnApplicationQuit");
+        }
     }
 }

@@ -5,19 +5,19 @@ namespace hhotLib
 {
     public class CheckNetwork
     {
+        public bool IsConnected { get; private set; }
+
+        public event Action<bool> ChangeNetworkStatusEvent;
+
         private float checkInterval;
         private float threshold;
 
-        public bool IsConnected;
-
-        public event Action<bool> NetworkStateChanged;
-
-        public CheckNetwork(float checkInterval)
+        public CheckNetwork(float interval)
         {
-            this.checkInterval = checkInterval;
-            threshold = Time.time + checkInterval;
-            IsConnected = false;
-            NetworkStateChanged = null;
+            checkInterval            = interval;
+            threshold                = Time.time + interval;
+            IsConnected              = false;
+            ChangeNetworkStatusEvent = null;
         }
 
         public void Update()
@@ -25,12 +25,13 @@ namespace hhotLib
             if (Time.time >= threshold)
             {
                 threshold = Time.time + checkInterval;
+
                 bool connected = Application.internetReachability != NetworkReachability.NotReachable;
                 if (IsConnected != connected)
                 {
-                    UnityEngine.Debug.Log("Network changed : " + connected);
+                    Debug.Log("Network status changed: " + connected);
                     IsConnected = connected;
-                    NetworkStateChanged?.Invoke(connected);
+                    ChangeNetworkStatusEvent?.Invoke(connected);
                 }
             }
         }

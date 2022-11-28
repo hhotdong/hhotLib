@@ -14,9 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   constantTags:
   - TagName: Default
-    ShouldDisplay: 1
-  - TagName: Debug
-    ShouldDisplay: 1
+    ShouldDisplay: 0
+  - TagName: Save
+    ShouldDisplay: 0
   - TagName: Test
-    ShouldDisplay: 1
+    ShouldDisplay: 0
+  - TagName: Debug
+    ShouldDisplay: 0
   temporaryTags: []

@@ -61,7 +61,7 @@ public class CaptureScreen : MonoBehaviour
 
         byte[] bytes = screenCaptured.EncodeToPNG();
         string fileName = string.Format("img_{0}.png", DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss"));
-        NativeGallery.SaveImageToGallery(bytes, "Picture", fileName);
+        //NativeGallery.SaveImageToGallery(bytes, "Picture", fileName);
         screenCaptured = null;
     }
 }
