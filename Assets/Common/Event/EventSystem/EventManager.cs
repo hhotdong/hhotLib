@@ -1,114 +1,100 @@
-﻿// https://learn.unity.com/tutorial/create-a-simple-messaging-system-with-events
-// https://medium.com/codex/rts-interlude-1-introducing-an-event-system-unity-c-14c121fb8ed
+﻿// Credit: https://learn.unity.com/tutorial/create-a-simple-messaging-system-with-events
+// Credit: https://medium.com/codex/rts-interlude-1-introducing-an-event-system-unity-c-14c121fb8ed
 
-using UnityEngine.Events;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using hhotLib.Common;
+using UnityEngine.Events;
 
-namespace hhotLib
+namespace hhotLib.Common
 {
     public class EventManager : Singleton<EventManager>
     {
-        private readonly Dictionary<string, UnityEvent> events = new Dictionary<string, UnityEvent>();
-        private readonly Dictionary<string, UnityEvent<CustomEventArgs>> paramEvents = new Dictionary<string, UnityEvent<CustomEventArgs>>();
-        private readonly Dictionary<string, Queue<UnityAction>> eventQueues = new Dictionary<string, Queue<UnityAction>>();
+        public delegate void EventDelegate<T>(T e) where T : CustomEventArgs;
+        private delegate void EventDelegateInternal(CustomEventArgs e);
 
-        protected override void OnAwake()
-        {
-            events.Clear();
-            paramEvents.Clear();
-            eventQueues.Clear();
-        }
-
-        protected override void OnDestroySingleton()
-        {
-            foreach (var item in events)
-            {
-                item.Value.RemoveAllListeners();
-            }
-
-            foreach (var item in paramEvents)
-            {
-                item.Value.RemoveAllListeners();
-            }
-
-            foreach (var item in eventQueues)
-            {
-                item.Value.Clear();
-            }
-
-            events.Clear();
-            paramEvents.Clear();
-            eventQueues.Clear();
-        }
+        private readonly Dictionary<string, UnityEvent>              paramlessEvents           = new Dictionary<string, UnityEvent>();
+        private readonly Dictionary<Type, EventDelegateInternal>     paramEventsDelegates      = new Dictionary<Type, EventDelegateInternal>();
+        private readonly Dictionary<Delegate, EventDelegateInternal> paramEventsDelegateLookup = new Dictionary<Delegate, EventDelegateInternal>();
+        private readonly Dictionary<string, Queue<UnityAction>>      eventQueues               = new Dictionary<string, Queue<UnityAction>>();
 
         public void Register(string eventName, UnityAction listener)
         {
-            if (events.TryGetValue(eventName, out UnityEvent evt))
-            {
+            if (paramlessEvents.TryGetValue(eventName, out UnityEvent evt))
                 evt.AddListener(listener);
-            }
             else
             {
                 evt = new UnityEvent();
                 evt.AddListener(listener);
-                events.Add(eventName, evt);
+                paramlessEvents.Add(eventName, evt);
             }
         }
 
         public void Unregister(string eventName, UnityAction listener)
         {
-            if (events.TryGetValue(eventName, out UnityEvent evt))
-            {
+            if (paramlessEvents.TryGetValue(eventName, out UnityEvent evt))
                 evt.RemoveListener(listener);
-            }
         }
 
         public void TriggerEvent(string eventName)
         {
-            if (events.TryGetValue(eventName, out UnityEvent evt))
-            {
+            if (paramlessEvents.TryGetValue(eventName, out UnityEvent evt))
                 evt.Invoke();
-            }
+            else
+                Debug.LogWarning($"Event({eventName}) not found!");
         }
 
-        public void RegisterParamEvent(string eventName, UnityAction<CustomEventArgs> listener)
+        public void RegisterParamEvent<T>(EventDelegate<T> del) where T : CustomEventArgs
         {
-            if (paramEvents.TryGetValue(eventName, out UnityEvent<CustomEventArgs> evt))
+            if (paramEventsDelegateLookup.ContainsKey(del))
+                return;
+
+            EventDelegateInternal internalDelegate = (e) => del((T)e);
+            paramEventsDelegateLookup[del] = internalDelegate;
+
+            if (paramEventsDelegates.TryGetValue(typeof(T), out EventDelegateInternal tempDel))
             {
-                evt.AddListener(listener);
+                tempDel += internalDelegate;
+                paramEventsDelegates[typeof(T)] = tempDel;
             }
             else
-            {
-                evt = new UnityEvent<CustomEventArgs>();
-                evt.AddListener(listener);
-                paramEvents.Add(eventName, evt);
-            }
+                paramEventsDelegates[typeof(T)] = internalDelegate;
         }
 
-        public void UnregisterParamEvent(string eventName, UnityAction<CustomEventArgs> listener)
+        public void UnregisterParamEvent<T>(EventDelegate<T> del) where T : CustomEventArgs
         {
-            if (paramEvents.TryGetValue(eventName, out UnityEvent<CustomEventArgs> evt))
-            {
-                evt.RemoveListener(listener);
-            }
+            if (paramEventsDelegateLookup.TryGetValue(del, out EventDelegateInternal internalDelegate) == false)
+                return;
+
+            if (paramEventsDelegates.TryGetValue(typeof(T), out EventDelegateInternal tempDel) == false)
+                return;
+            
+            paramEventsDelegateLookup.Remove(del);
+            tempDel -= internalDelegate;
+
+            if (tempDel == null)
+                paramEventsDelegates.Remove(typeof(T));
+            else
+                paramEventsDelegates[typeof(T)] = tempDel;
         }
 
-        public void TriggerParamEvent(string eventName, CustomEventArgs param)
+        public void TriggerParamEvent(CustomEventArgs args)
         {
-            if (paramEvents.TryGetValue(eventName, out UnityEvent<CustomEventArgs> evt))
-            {
-                evt.Invoke(param);
-            }
+            if (paramEventsDelegates.TryGetValue(args.GetType(), out EventDelegateInternal del))
+                del.Invoke(args);
+            else
+                Debug.LogWarning($"{args.GetType()} has no listeners");
+        }
+
+        public bool HasParamEventListener<T>(EventDelegate<T> del) where T : CustomEventArgs
+        {
+            return paramEventsDelegateLookup.ContainsKey(del);
         }
 
         public void RegisterQueuedEvent(string eventName, UnityAction callback)
         {
             if (eventQueues.TryGetValue(eventName, out Queue<UnityAction> queue))
-            {
                 queue.Enqueue(callback);
-            }
             else
             {
                 queue = new Queue<UnityAction>();
@@ -120,37 +106,71 @@ namespace hhotLib
         public void ClearQueuedEvent(string eventName)
         {
             if (eventQueues.TryGetValue(eventName, out Queue<UnityAction> queue))
-            {
                 queue.Clear();
+        }
+
+        public void TriggerQueuedEvent(string eventName, bool triggerAll, bool triggerOneByOne)
+        {
+            if (eventQueues.TryGetValue(eventName, out Queue<UnityAction> queue) == false)
+            {
+                Debug.LogWarning($"Event({eventName}) not found!");
+                return;
+            }
+
+            if (triggerAll)
+            {
+                if (triggerOneByOne)
+                    StartCoroutine(TriggerAllQueuedEventsOneByOne(queue));
+                else
+                {
+                    while (queue.Count > 0)
+                        queue.Dequeue().Invoke();
+                }
+                return;
+            }
+
+            queue.Dequeue().Invoke();
+        }
+
+        public bool HasQueuedEvent(string eventName)
+        {
+            return eventQueues.TryGetValue(eventName, out Queue<UnityAction> queue) && queue.Count > 0;
+        }
+
+        public void Dispose()
+        {
+            foreach (var item in paramlessEvents)
+                item.Value.RemoveAllListeners();
+
+            foreach (var item in eventQueues)
+                item.Value.Clear();
+
+            paramlessEvents          .Clear();
+            paramEventsDelegates     .Clear();
+            paramEventsDelegateLookup.Clear();
+            eventQueues              .Clear();
+        }
+
+        private IEnumerator TriggerAllQueuedEventsOneByOne(Queue<UnityAction> queue)
+        {
+            while (queue.Count > 0)
+            {
+                queue.Dequeue().Invoke();
+                yield return null;
             }
         }
 
-        public void TriggerQueuedEvent(string eventName, bool triggerAll)
+        protected override void OnAwake()
         {
-            if (eventQueues.TryGetValue(eventName, out Queue<UnityAction> queue))
-            {
-                if (triggerAll)
-                {
-                    StartCoroutine(TriggerAllEvents(queue));
-                }
-                else
-                {
-                    queue.Dequeue()?.Invoke();
-                }
-            }
-            else
-            {
-                Debug.LogError($"No event found for {eventName}!");
-            }
+            paramlessEvents          .Clear();
+            paramEventsDelegates     .Clear();
+            paramEventsDelegateLookup.Clear();
+            eventQueues              .Clear();
+        }
 
-            IEnumerator TriggerAllEvents(Queue<UnityAction> q)
-            {
-                for (int i = 0; i < q.Count; i++)
-                {
-                    q.Dequeue()?.Invoke();
-                    yield return null;
-                }
-            }
+        protected override void OnDestroySingleton()
+        {
+            Dispose();
         }
     }
 }

@@ -12,4 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b60aa30aa5894ec5891bdfc5bad4b4f, type: 3}
   m_Name: GameSettings
   m_EditorClassIdentifier: 
-  isGame: 0
+  sound:
+    volume: 1

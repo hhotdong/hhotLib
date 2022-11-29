@@ -2,26 +2,25 @@
 using UnityEngine;
 using UnityEngine.Audio;
 
-namespace hhotLib
+namespace hhotLib.Common
 {
     public static class FadeMixerGroup
     {
-        public static IEnumerator StartFade(AudioMixer audioMixer, string exposedParam, float duration, float targetVolume)
+        public static IEnumerator StartFadeCoroutine(AudioMixer audioMixer, string exposedParam, float duration, float targetVolume)
         {
-            float currentTime = 0;
-            float currentVol;
-            audioMixer.GetFloat(exposedParam, out currentVol);
-            currentVol = Mathf.Pow(10, currentVol / 20);
-            float targetValue = Mathf.Clamp(targetVolume, 0.0001F, 1.0F);
+            audioMixer.GetFloat(exposedParam, out float currentVolume);
+            currentVolume = Mathf.Pow(10, currentVolume / 20.0f);
+            targetVolume  = Mathf.Clamp(targetVolume, 0.0001f, 1.0f);
 
-            while (currentTime < duration)
+            float timer = 0.0f;
+            while (timer < duration)
             {
-                currentTime += Time.deltaTime;
-                float newVol = Mathf.Lerp(currentVol, targetValue, currentTime / duration);
-                audioMixer.SetFloat(exposedParam, Mathf.Log10(newVol) * 20);
+                timer += Time.unscaledDeltaTime;
+                float newVol = Mathf.Lerp(currentVolume, targetVolume, timer / duration);
+                audioMixer.SetFloat(exposedParam, Mathf.Log10(newVol) * 20.0f);
                 yield return null;
             }
-            yield break;
+            audioMixer.SetFloat(exposedParam, Mathf.Log10(targetVolume) * 20.0f);
         }
     }
 }

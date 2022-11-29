@@ -3,7 +3,7 @@ using System.IO;
 using UnityEngine;
 using UnityEditor;
 
-namespace hhotLib
+namespace hhotLib.Common
 {
     public class GameSettings : ScriptableObject
     {
@@ -20,30 +20,28 @@ namespace hhotLib
         {
             get
             {
-                if (instance == null)
-                {
-                    const string ROOT_NAME = "Assets";
-                    const string ASSET_PATH = "Resources/Configuration";
-                    const string FOLDER_PARENT_NAME = "Assets/Resources";
-                    const string FOLDER_NAME = "Configuration";
-                    const string ASSET_NAME = "GameSettings";
-                    const string ASSET_EXTENSION = ".asset";
+                if (instance != null)
+                    return instance;
+            #if UNITY_EDITOR
+                const string ASSET_PATH       = "Assets/Resources/Configuration";
+                const string ASSET_NAME       = "GameSettings";
+                const string ASSET_EXT        = ".asset";
+                string assetPath              = Path.Combine(ASSET_PATH, ASSET_NAME);
+                string assetPathWithExtension = Path.ChangeExtension(assetPath, ASSET_EXT);
+                instance = AssetDatabase.LoadAssetAtPath<GameSettings>(assetPathWithExtension);
 
-                    instance = Resources.Load(ASSET_NAME) as GameSettings;
-                    if (instance == null)
-                    {
-                        instance = CreateInstance<GameSettings>();
-#if UNITY_EDITOR
-                        string path = Path.Combine(Application.dataPath, ASSET_PATH);
-                        if (!Directory.Exists(path))
-                            AssetDatabase.CreateFolder(FOLDER_PARENT_NAME, FOLDER_NAME);
+                if (instance != null)
+                    return instance;
 
-                        string fullPath = Path.Combine(Path.Combine(ROOT_NAME, ASSET_PATH), ASSET_NAME + ASSET_EXTENSION);
-                        AssetDatabase.CreateAsset(instance, fullPath);
-#endif
-                    }
-                }
+                Directory.CreateDirectory(ASSET_PATH);
+                instance = ScriptableObject.CreateInstance<GameSettings>();
+                AssetDatabase.CreateAsset(instance, assetPathWithExtension);
+                AssetDatabase.SaveAssets();
                 return instance;
+            #else
+                instance = ScriptableObject.CreateInstance<GameSettings>();
+                return instance;
+            #endif
             }
         }
     }

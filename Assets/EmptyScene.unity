@@ -326,6 +326,31 @@ MonoBehaviour:
     orbitSpeed: 0.1
     zoomSpeed_Mouse: 20
     zoomSpeed_Touch: 0.25
+  tr: {fileID: 0}
+  mainCam: {fileID: 0}
+  isPanning: 1
+  isZooming: 1
+  isOrbiting: 0
+  isTransitioning: 0
+  isTrackTouchInput: 0
+  camOrbitPoint: {fileID: 0}
+  orbitTarget: {fileID: 0}
+  xDeg: 0
+  yDeg: 0
+  initZoomValue: 0
+  desiredZoomValue: 0
+  prevZoomValue: 0
+  lastZoomPositions:
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  lastPanPosition: {x: 0, y: 0, z: 0}
+  desiredPanPosition: {x: 0, y: 0, z: 0}
+  targetViewPoint: {x: 0, y: 0, z: 0}
+  initPosition: {x: 0, y: 0, z: 0}
+  previousPosition: {x: 0, y: 0, z: 0}
+  initRot: {x: 0, y: 0, z: 0, w: 0}
+  orbitModeRot: {x: 0, y: 0, z: 0, w: 0}
+  desiredOrbitRotation: {x: 0, y: 0, z: 0, w: 0}
 --- !u!114 &1630116441
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -351,6 +376,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   settings: {fileID: 11400000, guid: a7a796e664acc4cfbb344eaf230845d8, type: 2}
+--- !u!1 &2025994302 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8575579061271281744, guid: 32bd23433d60f4671a5f9a4f0c6e4edb,
+    type: 3}
+  m_PrefabInstance: {fileID: 225175295920937252}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2025994303
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2025994302}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cbe78a04f77694e94aa33ca00b9b0430, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  poolObjectPrefab: {fileID: 5048438862647393085, guid: a4fabcf66cc5b4dadad6fe93c3454e0d,
+    type: 3}
+  initPoolAmount: 2
+  maxPoolAmount: 5
 --- !u!1001 &225175295920937252
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -358,6 +405,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 6467100933737876541, guid: 32bd23433d60f4671a5f9a4f0c6e4edb,
+        type: 3}
+      propertyPath: pool
+      value: 
+      objectReference: {fileID: 2025994303}
     - target: {fileID: 7023187364539615525, guid: 32bd23433d60f4671a5f9a4f0c6e4edb,
         type: 3}
       propertyPath: m_RootOrder

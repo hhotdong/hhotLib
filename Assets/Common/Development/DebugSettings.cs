@@ -19,12 +19,12 @@ public class DebugSettings : ScriptableObject
         {
             if (instance != null)
                 return instance;
-#if UNITY_EDITOR
+        #if UNITY_EDITOR
             const string ASSET_PATH       = "Assets/Editor Default Resources";
-            const string ASSET_FILE_NAME  = "DebugSettings";
-            const string ASSET_FILE_EXT   = ".asset";
-            string assetPath              = Path.Combine(ASSET_PATH, ASSET_FILE_NAME);
-            string assetPathWithExtension = Path.ChangeExtension(assetPath, ASSET_FILE_EXT);
+            const string ASSET_NAME       = "DebugSettings";
+            const string ASSET_EXT        = ".asset";
+            string assetPath              = Path.Combine(ASSET_PATH, ASSET_NAME);
+            string assetPathWithExtension = Path.ChangeExtension(assetPath, ASSET_EXT);
             instance = AssetDatabase.LoadAssetAtPath<DebugSettings>(assetPathWithExtension);
 
             if (instance != null)
@@ -35,10 +35,10 @@ public class DebugSettings : ScriptableObject
             AssetDatabase.CreateAsset(instance, assetPathWithExtension);
             AssetDatabase.SaveAssets();
             return instance;
-#else
+        #else
             instance = ScriptableObject.CreateInstance<DebugSettings>();
             return instance;
-#endif
+        #endif
         }
     }
 
@@ -91,7 +91,10 @@ public class DebugSettings : ScriptableObject
         }
 
         for (int i = 0; i < constantTags.Length; i++)
-            constantTags[i].TagName = constants[i].Name;
+        {
+            constantTags[i].TagName       = constants[i].Name;
+            constantTags[i].ShouldDisplay = true;
+        }
 
         var groupByTag_temp = temporaryTags.GroupBy(x => x.TagName.ToUpper());
         isDuplicate = groupByTag_temp.Any(g => g.Count() > 1);
@@ -107,14 +110,14 @@ public class DebugSettings : ScriptableObject
 public class DebugTag
 {
     [Disable] public string TagName;
-    public bool ShouldDisplay;
+    [Disable] public bool   ShouldDisplay;
 }
 
 [Serializable]
 public class DebugTag_Temporary
 {
     public string TagName;
-    public bool ShouldDisplay;
+    public bool   ShouldDisplay;
 }
 
 public static class DebugTagConstant
