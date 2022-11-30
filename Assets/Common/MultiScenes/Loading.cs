@@ -8,73 +8,70 @@ namespace hhotLib.Common
     [RequireComponent(typeof(CanvasGroup))]
     public class Loading : MonoBehaviour
     {
+        [SerializeField] private Slider          progressBar;
+        [SerializeField] private TextMeshProUGUI progressText;
+
         private CanvasGroup cg;
-        
-        [SerializeField] private Slider m_ProgressBar;
-        [SerializeField] private TextMeshProUGUI m_ProgressText;
 
         private void Awake()
         {
             cg = GetComponent<CanvasGroup>();
             cg.alpha = 0.0f;
-            SceneLoader.LoadingStartedEvent += OnLoadingStarted;
-            SceneLoader.LoadingEvent += OnLoading;
-            SceneLoader.LoadingCompletedEvent += OnLoadingCompleted;
-            QueryManager.RegisterProvider<CheckLoadingWindowVisibleRequest, bool>(CheckIfVisible);
+            SceneLoader.StartLoadingEvent    += OnStartLoading;
+            SceneLoader.LoadingEvent         += OnLoading;
+            SceneLoader.CompleteLoadingEvent += OnCompleteLoading;
+            QueryManager.RegisterProvider<QueryLoadingWindowVisible, bool>(IsVisible);
         }
 
-        private bool CheckIfVisible(CheckLoadingWindowVisibleRequest request)
+        private bool IsVisible(QueryLoadingWindowVisible request)
         {
-            return request.CheckVisible ? cg.enabled && cg.alpha > 0.9999f : !DOTween.IsTweening(cg) && cg.alpha < 0.0001f;
+            if (request.isVisible)
+                return cg.enabled && cg.alpha > 0.9999f;
+            else
+                return DOTween.IsTweening(cg) == false && cg.alpha < 0.0001f;
         }
 
         private void OnDestroy()
         {
-            cg = null;
-            SceneLoader.LoadingStartedEvent -= OnLoadingStarted;
-            SceneLoader.LoadingEvent -= OnLoading;
-            SceneLoader.LoadingCompletedEvent -= OnLoadingCompleted;
+            SceneLoader.StartLoadingEvent    -= OnStartLoading;
+            SceneLoader.LoadingEvent         -= OnLoading;
+            SceneLoader.CompleteLoadingEvent -= OnCompleteLoading;
         }
 
-        private void OnLoadingStarted(string sceneName)
+        private void OnStartLoading(string sceneName)
         {
             if (DOTween.IsTweening(cg))
                 cg.DOKill();
 
             cg.DOFade(1.0f, 1.0f)
-                .OnStart(() =>
-                {
-                    cg.alpha = 0.0f;
-                    m_ProgressBar.value = 0.0f;
-                    m_ProgressText.text = "0%";
-                })
-                .Play();
+                .OnStart(() => {
+                    cg.alpha          = 0.0f;
+                    progressBar.value = 0.0f;
+                    progressText.text = "0%";
+                }).Play();
         }
 
         private void OnLoading(float progress)
         {
-            progress = Mathf.Clamp01(progress / 0.9f);
-            m_ProgressBar.value = progress;
-            m_ProgressText.text = Mathf.Round(progress * 100.0f).ToString("{0}%");
-            UnityEngine.Debug.Log($"Loading next scene...{progress * 100.0f}%");
+            progress          = Mathf.Clamp01(progress / 0.9f);
+            progressBar.value = progress;
+            progressText.text = Mathf.Round(progress * 100.0f).ToString("{0}%");
+            UnityEngine.Debug.Log($"Loading scene...{progress * 100.0f}%");
         }
 
-        private void OnLoadingCompleted(string sceneName)
+        private void OnCompleteLoading(string sceneName)
         {
             if (DOTween.IsTweening(cg))
                 cg.DOKill();
 
             cg.DOFade(0.0f, 1.0f)
-                .OnStart(() =>
-                {
-                    m_ProgressBar.value = 1.0f;
-                    m_ProgressText.text = "100%";
+                .OnStart(() => {
+                    progressBar.value = 1.0f;
+                    progressText.text = "100%";
                 })
-                .OnComplete(() =>
-                {
+                .OnComplete(() => {
                     cg.alpha = 0.0f;
-                })
-                .Play();
+                }).Play();
         }
     }
 }

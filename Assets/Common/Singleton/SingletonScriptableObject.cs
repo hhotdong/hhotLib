@@ -17,8 +17,8 @@ namespace hhotLib.Common
                         return instance = instances[0];
 
                     Debug.LogWarning($"[{nameof(SingletonScriptableObject<T>)}] There should never be " +
-                                $"more than one {nameof(SingletonScriptableObject<T>)} in the project, " +
-                                $"but {count} were found. The first instance found will be used, and all others will be destroyed.");
+                        $"more than one {nameof(SingletonScriptableObject<T>)} in the project, " +
+                        $"but {count} were found. The first instance found will be used, and all others will be destroyed.");
 
                     for (int i = 1; i < instances.Length; i++)
                         DestroyImmediate(instances[i], true);

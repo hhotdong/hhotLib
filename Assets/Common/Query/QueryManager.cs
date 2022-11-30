@@ -1,4 +1,4 @@
-//https://coffeebraingames.wordpress.com/2017/10/31/simple-query-system/
+// Credit: https://coffeebraingames.wordpress.com/2017/10/31/simple-query-system/
 
 namespace hhotLib.Common
 {
@@ -11,6 +11,11 @@ namespace hhotLib.Common
         public static void RegisterProvider<R, V>(QueryProvider<R, V> provider) where R : QueryRequest
         {
             INTERNAL_MANAGER.RegisterProvider(provider);
+        }
+
+        public static void UnregisterProvider<R>() where R : QueryRequest
+        {
+            INTERNAL_MANAGER.UnregisterProvider<R>();
         }
 
         public static bool HasProvider<R>() where R : QueryRequest
