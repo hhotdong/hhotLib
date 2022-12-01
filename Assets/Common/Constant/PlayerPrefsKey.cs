@@ -1,4 +1,4 @@
-public static class PlayerPrefsKeys
+public static class PlayerPrefsKey
 {
     public static class Setting
     {

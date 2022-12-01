@@ -6,36 +6,20 @@ using Random = UnityEngine.Random;
 
 namespace hhotLib.Common
 {
-    public enum SoundType
-    {
-        NONE = -1,
-        BUTTON_DEFAULT = 0,
-        BUTTON_UPGRADE = 1
-    }
-
     [Serializable]
-    public class SoundGroup
+    public class AudioClipGroup
     {
-        public SoundType type;
-        public List<AudioClip> clips;
+        public string      groupName;
+        public AudioClip[] clips;
 
-        public AudioClip GetClip()
+        public AudioClip GetRandomClip()
         {
-            if (clips?.Count > 0)
-            {
-                return clips[Random.Range(0, clips.Count)];
-            }
-            else
-            {
-                return null;
-            }
+            return clips[Random.Range(0, clips.Length)];
         }
     }
 
     public class SoundManager : Singleton<SoundManager>
     {
-        public Settings settings;
-
         [Serializable]
         public class Settings
         {
@@ -48,104 +32,93 @@ namespace hhotLib.Common
             [SerializeField, Range(0.1f, 2.0f)] private float fadeDuration = 1.0f;
         }
 
-        public static class ExposedParams
-        {
-            public const string MASTER_VOLUME = "MasterVolume";
-            public const string BGM_VOLUME    = "BGMVolume";
-            public const string SFX_VOLUME    = "SFXVolume";
-        }
-
+        [SerializeField] private Settings         settings;
         [SerializeField] private AudioMixerGroup  mixerGroup_SFX;
         [SerializeField] private AudioMixerGroup  mixerGroup_BGM;
-        [SerializeField] private SoundGroup[]     soundGroups;
+        [SerializeField] private AudioClipGroup[] audioClipGroups;
 
         private AudioMixer  mainMixer;
         private AudioSource effectSource;
         private AudioSource musicSource;
 
-        private static readonly Dictionary<SoundType, SoundGroup> SoundGroupsDict = new Dictionary<SoundType, SoundGroup>();
+        private static readonly Dictionary<string, AudioClip> audioClips = new Dictionary<string, AudioClip>();
 
         protected override void OnAwake()
         {
-            mainMixer    = mixerGroup_BGM.audioMixer;
-
             effectSource = gameObject.AddComponent<AudioSource>();
-            musicSource  = gameObject.AddComponent<AudioSource>();
-
             effectSource.playOnAwake = false;
-            musicSource .playOnAwake = false;
-
-            effectSource.loop = false;
-            musicSource .loop = true;
-
+            effectSource.loop        = false;
             effectSource.outputAudioMixerGroup = mixerGroup_SFX;
-            musicSource .outputAudioMixerGroup = mixerGroup_BGM;
 
-            SoundGroupsDict.Clear();
-            for (int i = 0; i < soundGroups.Length; i++)
-            {
-                if (soundGroups[i] != null && !SoundGroupsDict.ContainsKey(soundGroups[i].type))
-                    SoundGroupsDict.Add(soundGroups[i].type, soundGroups[i]);
-            }
+            musicSource = gameObject.AddComponent<AudioSource>();
+            musicSource.playOnAwake = false;
+            musicSource.loop        = true;
+            musicSource.outputAudioMixerGroup = mixerGroup_BGM;
+
+            LoadAudioClips();
+        }
+
+        private void LoadAudioClips()
+        {
+            audioClips.Add(AudioClipName.BUTTON_CLICK_A, Resources.Load<AudioClip>("ButtonClick_A"));
+            audioClips.Add(AudioClipName.BUTTON_CLICK_B, Resources.Load<AudioClip>("ButtonClick_B"));
         }
 
         private void Start()
         {
-            if (PlayerPrefs.HasKey(PlayerPrefsKeys.Setting.TOGGLE_AUDIO))
-            {
-                if (PlayerPrefs.GetInt(PlayerPrefsKeys.Setting.TOGGLE_AUDIO, 0) == 0)
-                    AudioListener.pause = true;
-                else
-                    AudioListener.pause = false;
-            }
+            if (PlayerPrefs.GetInt(PlayerPrefsKey.Setting.TOGGLE_AUDIO, 1) == 0)
+                AudioListener.pause = true;
             else
-            {
                 AudioListener.pause = false;
-                PlayerPrefs.SetInt(PlayerPrefsKeys.Setting.TOGGLE_AUDIO, 0);
-                PlayerPrefs.Save();
-            }
-        }
-
-        protected override void OnDestroySingleton()
-        {
-            mainMixer    = null;
-            effectSource = null;
-            musicSource  = null;
         }
 
         public void ToggleAudio(bool toggle)
         {
             AudioListener.pause = !toggle;
-            PlayerPrefs.SetInt(PlayerPrefsKeys.Setting.TOGGLE_AUDIO, toggle ? 1 : 0);
+            PlayerPrefs.SetInt(PlayerPrefsKey.Setting.TOGGLE_AUDIO, toggle ? 1 : 0);
             PlayerPrefs.Save();
         }
 
-        public void PlaySoundEffect(SoundType type, float volume = 1.0f, bool isRandomPitch = false)
+        public void PlaySoundEffect(string clipName, float volume = 1.0f)
         {
-            if (SoundGroupsDict.ContainsKey(type))
+            if (audioClips.ContainsKey(clipName) == false)
             {
-                if (isRandomPitch)
-                    effectSource.pitch = Random.Range(settings.LowPitch, settings.HighPitch);
-
-                effectSource.PlayOneShot(SoundGroupsDict[type].GetClip(), volume);
+                Debug.LogWarning($"AudioClip({clipName}) not found!");
+                return;
             }
-            else
-                Debug.Log($"There is no such type{type} in the dictionary!");
+            effectSource.PlayOneShot(audioClips[clipName], volume);
         }
 
-        public void PlaySoundEffectDelayed(SoundType type, float volume = 1.0f, bool isRandomPitch = false, float delay = 0.1f)
+        public void PlayRandomSoundEffect(string audioGroupName, float volume = 1.0f)
         {
-            if (SoundGroupsDict.ContainsKey(type))
+            AudioClipGroup acGroup = null;
+            for (int i = 0; i < audioClipGroups.Length; i++)
             {
-                if (isRandomPitch)
-                    effectSource.pitch = Random.Range(settings.LowPitch, settings.HighPitch);
-
-                effectSource.clip = SoundGroupsDict[type].GetClip();
-                effectSource.volume = volume;
-                effectSource.PlayDelayed(delay);
+                if (audioClipGroups[i].groupName == audioGroupName)
+                {
+                    acGroup = audioClipGroups[i];
+                    break;
+                }
             }
-            else
-                Debug.Log($"There is no such type{type} in the dictionary!");
+
+            if (acGroup == null)
+            {
+                Debug.LogWarning($"AudioClipGroup({audioGroupName}) not found!");
+                return;
+            }
+            effectSource.PlayOneShot(acGroup.GetRandomClip(), volume);
+        }
+
+        public void PlaySoundEffectDelayed(string clipName, float volume = 1.0f, float delay = 0.1f)
+        {
+            if (audioClips.ContainsKey(clipName) == false)
+            {
+                Debug.LogWarning($"AudioClip({clipName}) not found!");
+                return;
+            }
+            effectSource.clip   = audioClips[clipName];
+            effectSource.volume = volume;
+            effectSource.PlayDelayed(delay);
         }
     }
 }
