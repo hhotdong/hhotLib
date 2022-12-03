@@ -24,11 +24,6 @@ namespace hhotLib.Common
 
         private LocalObjectPool pool;
 
-        private void Awake()
-        {
-            pool = GetComponent<LocalObjectPool>();
-        }
-
         public void Play()
         {
             StartCoroutine(PlayCoroutine());
@@ -64,6 +59,11 @@ namespace hhotLib.Common
                 case CoinEffectType.Gold: return Resources.Load<Sprite>("UI_GoldCoin");
                 case CoinEffectType.Gem : return Resources.Load<Sprite>("UI_GemCoin");
             }
+        }
+
+        private void Awake()
+        {
+            pool = GetComponent<LocalObjectPool>();
         }
     }
 }

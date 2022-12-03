@@ -13,12 +13,6 @@ namespace hhotLib.Common
         private RectTransform rt;
         private Image         coinImage;
 
-        private void Awake()
-        {
-            rt        = GetComponent<RectTransform>();
-            coinImage = GetComponentInChildren<Image>();
-        }
-
         public void SetImage(Sprite coinSprite, float scaler)
         {
             coinImage.sprite = coinSprite;
@@ -49,6 +43,12 @@ namespace hhotLib.Common
                 .Append(rt.DOMove(destination.position, moveDuration).SetEase(moveEase))
                 .OnComplete(() => onEnd?.Invoke())
                 .Play();
+        }
+
+        private void Awake()
+        {
+            rt        = GetComponent<RectTransform>();
+            coinImage = GetComponentInChildren<Image>();
         }
     }
 }
