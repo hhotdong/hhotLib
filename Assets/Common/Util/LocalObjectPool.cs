@@ -9,8 +9,9 @@ namespace hhotLib.Common
         public int MaxPoolAmount => maxPoolAmount;
 
         [SerializeField] private GameObject poolObjectPrefab;
-        [SerializeField] private int        initPoolAmount =  2;
-        [SerializeField] private int        maxPoolAmount  = 10;
+        [SerializeField] private int        initPoolAmount  =  2;
+        [SerializeField] private int        shrinkThreshold =  6;
+        [SerializeField] private int        maxPoolAmount   = 10;
 
         private Transform tr;
 
@@ -49,6 +50,14 @@ namespace hhotLib.Common
                 Debug.LogError($"Failed to free GameObject! It doesn't belong to this pool!");
                 return;
             }
+
+            if (poolObjects.Count > shrinkThreshold)
+            {
+                poolObjects.Remove(obj);
+                Destroy(obj);
+                return;
+            }
+
             obj.SetActive(false);
             unusedPoolObjects.Enqueue(obj);
         }
@@ -67,6 +76,9 @@ namespace hhotLib.Common
 
         private IEnumerator Start()
         {
+            if (shrinkThreshold < initPoolAmount || shrinkThreshold > maxPoolAmount)
+                shrinkThreshold = (initPoolAmount + maxPoolAmount) / 2;
+
             for (int i = 0; i < initPoolAmount; i++)
             {
                 GameObject newObj = CreatePoolObject(true);
