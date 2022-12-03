@@ -6,11 +6,13 @@ namespace hhotLib.Common
 {
     public class LocalObjectPool : MonoBehaviour
     {
-        [SerializeField] private GameObject poolObjectPrefab;
-        [SerializeField] private int        initPoolAmount    = 2;
-        [SerializeField] private int        maxPoolAmount     = 10;
+        public int MaxPoolAmount => maxPoolAmount;
 
-        private Transform  tr;
+        [SerializeField] private GameObject poolObjectPrefab;
+        [SerializeField] private int        initPoolAmount =  2;
+        [SerializeField] private int        maxPoolAmount  = 10;
+
+        private Transform tr;
 
         private readonly HashSet<GameObject> poolObjects       = new HashSet<GameObject>();
         private readonly Queue<GameObject>   unusedPoolObjects = new Queue<GameObject>();
@@ -29,6 +31,7 @@ namespace hhotLib.Common
                 unusedPoolObjects.Enqueue(newObj);
             }
             var obj = unusedPoolObjects.Dequeue();
+            obj.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
             obj.SetActive(true);
             return obj;
         }
@@ -52,7 +55,7 @@ namespace hhotLib.Common
 
         private GameObject CreatePoolObject(bool isInit)
         {
-            GameObject obj = Instantiate(poolObjectPrefab, tr);
+            GameObject obj = Instantiate(poolObjectPrefab, Vector3.zero, Quaternion.identity, tr);
             obj.SetActive(!isInit);
             return obj;
         }
