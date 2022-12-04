@@ -1,10 +1,10 @@
-﻿// Original source code: Mirza Beig
-
+﻿// Credit: Mirza Beig
+using System;
 using System.Collections;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
-public enum CameraShakeAmplitudeCurve
-{
+public enum CameraShakeAmplitudeCurve {
     Constant,
     FadeInOut25,
     FadeInOut50,
@@ -12,8 +12,7 @@ public enum CameraShakeAmplitudeCurve
     Custom
 }
 
-public enum CameraShakeAmplitudeOverDistanceCurve
-{
+public enum CameraShakeAmplitudeOverDistanceCurve {
     Constant,
     LinearFadeIn,
     LinearFadeOut
@@ -21,87 +20,89 @@ public enum CameraShakeAmplitudeOverDistanceCurve
 
 public class CameraShake : MonoBehaviour
 {
-    [SerializeField] private float Amplitude = 1.0F;
-    [SerializeField] private float Frequency = 5.0F;
-    [SerializeField] private float Duration = 2.5F;
-    [SerializeField] private float smoothDampTime = 0.045F;
-    [SerializeField] private CameraShakeAmplitudeCurve AmplitudeCurve = CameraShakeAmplitudeCurve.FadeInOut75;
-    [SerializeField] private AnimationCurve CustomCurve;
+    public bool IsShaking { get; private set; }
 
-    private Shake currshake;
+    [SerializeField] private float                     amplitude      = 1.0f;
+    [SerializeField] private float                     frequency      = 5.0f;
+    [SerializeField] private float                     duration       = 2.5f;
+    [SerializeField] private float                     smoothDampTime = 0.045f;
+    [SerializeField] private CameraShakeAmplitudeCurve amplitudeCurve = CameraShakeAmplitudeCurve.FadeInOut75;
+    [SerializeField] private AnimationCurve            customCurve;
+
     private Transform tr;
-    private float smoothDampRotationVelocityX;
-    private float smoothDampRotationVelocityY;
-    private float smoothDampRotationVelocityZ;
+    private Shake     curShake;
+    private float     smoothDampRotationVelocityX;
+    private float     smoothDampRotationVelocityY;
+    private float     smoothDampRotationVelocityZ;
+
     private readonly float ROT_DIFF_MIN = 0.1F;
-    public bool IsShaking { get; private set; } = false;
 
     private void Awake()
     {
         tr = GetComponent<Transform>();
     }
 
-    public void ShakeNow(System.Action callback)
+    public void ShakeNow(Action callback)
     {
-        if (currshake == null)
-            StartCoroutine(ShakeProcess(callback));
-        else
-            Debug.Log("There is already playing Shake!");
+        if (curShake != null)
+        {
+            Debug.LogWarning("There is already playing Shake!");
+            return;
+        }
+        StartCoroutine(ShakeCoroutine(callback));
     }
 
-    private IEnumerator ShakeProcess(System.Action callback)
+    private IEnumerator ShakeCoroutine(Action callback)
     {
         IsShaking = true;
+
+        Vector3 originEulerAngles = tr.eulerAngles;
+        Vector3 rotationOffset    = originEulerAngles;
+
         Vector3 eulerAngles;
-        Vector3 rotationOffset;
-        Vector3 originEulerAngles;
-
-        currshake = new Shake(Amplitude, Frequency, Duration, AmplitudeCurve, CustomCurve);
-        rotationOffset = originEulerAngles = tr.eulerAngles;
-
-        while (currshake != null && currshake.IsAlive() == true)
+        curShake = new Shake(amplitude, frequency, duration, amplitudeCurve, customCurve);
+        while (curShake != null && curShake.IsAlive())
         {
-            currshake.Update();
+            curShake.Update();
             rotationOffset = originEulerAngles;
-            rotationOffset += currshake.noise;
-            eulerAngles = tr.eulerAngles;
-            eulerAngles.x = Mathf.SmoothDampAngle(eulerAngles.x, rotationOffset.x, ref smoothDampRotationVelocityX, smoothDampTime);
-            eulerAngles.y = Mathf.SmoothDampAngle(eulerAngles.y, rotationOffset.y, ref smoothDampRotationVelocityY, smoothDampTime);
-            eulerAngles.z = Mathf.SmoothDampAngle(eulerAngles.z, rotationOffset.z, ref smoothDampRotationVelocityZ, smoothDampTime);
+            rotationOffset += curShake.noise;
+            eulerAngles    = tr.eulerAngles;
+            eulerAngles.x  = Mathf.SmoothDampAngle(eulerAngles.x, rotationOffset.x, ref smoothDampRotationVelocityX, smoothDampTime);
+            eulerAngles.y  = Mathf.SmoothDampAngle(eulerAngles.y, rotationOffset.y, ref smoothDampRotationVelocityY, smoothDampTime);
+            eulerAngles.z  = Mathf.SmoothDampAngle(eulerAngles.z, rotationOffset.z, ref smoothDampRotationVelocityZ, smoothDampTime);
             tr.eulerAngles = eulerAngles;
             yield return null;
         }
-        currshake = null;
+        curShake = null;
 
         do
         {
-            eulerAngles = tr.eulerAngles;
-            eulerAngles.x = Mathf.SmoothDampAngle(eulerAngles.x, rotationOffset.x, ref smoothDampRotationVelocityX, smoothDampTime);
-            eulerAngles.y = Mathf.SmoothDampAngle(eulerAngles.y, rotationOffset.y, ref smoothDampRotationVelocityY, smoothDampTime);
-            eulerAngles.z = Mathf.SmoothDampAngle(eulerAngles.z, rotationOffset.z, ref smoothDampRotationVelocityZ, smoothDampTime);
+            eulerAngles    = tr.eulerAngles;
+            eulerAngles.x  = Mathf.SmoothDampAngle(eulerAngles.x, rotationOffset.x, ref smoothDampRotationVelocityX, smoothDampTime);
+            eulerAngles.y  = Mathf.SmoothDampAngle(eulerAngles.y, rotationOffset.y, ref smoothDampRotationVelocityY, smoothDampTime);
+            eulerAngles.z  = Mathf.SmoothDampAngle(eulerAngles.z, rotationOffset.z, ref smoothDampRotationVelocityZ, smoothDampTime);
             tr.eulerAngles = eulerAngles;
         }
         while (Vector3.Angle(eulerAngles, tr.eulerAngles) >= ROT_DIFF_MIN);
 
-        callback?.Invoke();
         tr.eulerAngles = originEulerAngles;
-        IsShaking = false;
+        IsShaking      = false;
+        callback?.Invoke();
     }
 
-    [System.Serializable]
+    [Serializable]
     public class Shake
     {
         public float amplitude = 1.0f;
         public float frequency = 1.0f;
         public float duration;
 
-        float timeRemaining;
-
-        Vector2 perlinNoiseX;
-        Vector2 perlinNoiseY;
-        Vector2 perlinNoiseZ;
-
         [HideInInspector] public Vector3 noise;
+
+        private float  timeRemaining;
+        private Vector2 perlinNoiseX;
+        private Vector2 perlinNoiseY;
+        private Vector2 perlinNoiseZ;
 
         public AnimationCurve amplitudeOverLifetimeCurve = new AnimationCurve(new Keyframe(0.0f, 1.0f), new Keyframe(1.0f, 0.0f));
 
@@ -110,7 +111,8 @@ public class CameraShake : MonoBehaviour
             timeRemaining = duration;
             ApplyRandomSeed();
         }
-        void Init(float amplitude, float frequency, float duration)
+
+        private void Init(float amplitude, float frequency, float duration)
         {
             this.amplitude = amplitude;
             this.frequency = frequency;
@@ -189,9 +191,7 @@ public class CameraShake : MonoBehaviour
         public void Update()
         {
             if (timeRemaining < 0.0f)
-            {
                 return;
-            }
 
             Vector2 frequencyVector = Time.deltaTime * new Vector2(frequency, frequency);
 

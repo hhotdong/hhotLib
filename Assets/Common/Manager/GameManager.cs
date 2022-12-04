@@ -49,7 +49,7 @@ namespace hhotLib.Common
         private void Update()
         {
             if (checkNetworkPeriodically)
-                checkNetwork.Update();
+                checkNetwork.UpdateStatus();
         }
 
         private void OnApplicationPause(bool pause)
