@@ -1,6 +1,5 @@
 ﻿// Credit: https://learn.unity.com/tutorial/create-a-simple-messaging-system-with-events
 // Credit: https://medium.com/codex/rts-interlude-1-introducing-an-event-system-unity-c-14c121fb8ed
-
 using System;
 using System.Collections;
 using System.Collections.Generic;

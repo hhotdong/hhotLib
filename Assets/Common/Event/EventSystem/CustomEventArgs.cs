@@ -1,11 +1,14 @@
-public abstract class CustomEventArgs { }
-
-public sealed class TestEventArgs : CustomEventArgs
+namespace hhotLib.Common
 {
-    public int num;
+    public abstract class CustomEventArgs { }
 
-    public TestEventArgs(int num)
+    public sealed class TestEventArgs : CustomEventArgs
     {
-        this.num = num;
+        public int num;
+
+        public TestEventArgs(int num)
+        {
+            this.num = num;
+        }
     }
 }

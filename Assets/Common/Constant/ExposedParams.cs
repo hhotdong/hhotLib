@@ -1,6 +1,9 @@
-public static class ExposedParams
+namespace hhotLib.Common
 {
-    public static readonly string MASTER_VOLUME = "MasterVolume";
-    public static readonly string BGM_VOLUME    = "BGMVolume";
-    public static readonly string SFX_VOLUME    = "SFXVolume";
+    public static class ExposedParams
+    {
+        public static readonly string MASTER_VOLUME = "MasterVolume";
+        public static readonly string BGM_VOLUME    = "BGMVolume";
+        public static readonly string SFX_VOLUME    = "SFXVolume";
+    }
 }

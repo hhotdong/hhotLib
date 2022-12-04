@@ -1,31 +1,39 @@
 using UnityEngine;
-using hhotLib.Common;
+using UnityEngine.UI;
+using TMPro;
 
-public class TestController : DebugOnlyMonoBehaviour
-{
-    private void Update()
+namespace hhotLib.Common
+{ 
+    public class TestController : DebugOnlyMonoBehaviour
     {
-        if (Input.GetKeyDown(KeyCode.Alpha1))
+        public TextMeshProUGUI text;
+        public Image img;
+
+        private void Update()
         {
+            if (Input.GetKeyDown(KeyCode.Alpha1))
+            {
+                Utils.AlignTextAndImageFromCenter(text, img);
+            }
+
+            if (Input.GetKeyDown(KeyCode.Alpha2))
+            {
+            }
+
+            if (Input.GetKeyDown(KeyCode.Alpha3))
+            {
+            }
+
+            if (Input.GetKeyDown(KeyCode.Alpha4))
+            {
+            }
         }
 
-        if (Input.GetKeyDown(KeyCode.Alpha2))
+        private void OnGUI()
         {
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha4))
-        {
-        }
-    }
-
-    private void OnGUI()
-    {
-        if (GUI.Button(new Rect(0, 0, 100, 100), "Load test scene"))
-        {
+            if (GUI.Button(new Rect(0, 0, 100, 100), "Load test scene"))
+            {
+            }
         }
     }
 }

@@ -1,9 +1,8 @@
 using System;
 using System.Collections;
 using UnityEngine;
-using hhotLib.Common;
 
-namespace hhotLib
+namespace hhotLib.Common
 {
     public class GameManager : Singleton<GameManager>
     {

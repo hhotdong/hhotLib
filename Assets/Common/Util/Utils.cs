@@ -18,34 +18,41 @@ namespace hhotLib.Common
 #elif UNITY_ANDROID || UNITY_IOS
             pointerId = 0;
 #endif
-
             EventSystem eventSystem = EventSystem.current;
-            if (eventSystem != null)
+            if (eventSystem == null)
             {
-                return eventSystem.IsPointerOverGameObject(pointerId);
-            }
-            else
-            {
-                Debug.LogError("There is no eventsystem.");
+                Debug.LogError("There is no eventsystem!");
                 return false;
             }
+            return eventSystem.IsPointerOverGameObject(pointerId);
         }
 
-        public static void AlignWithSameDistanceFromCenter(TextMeshProUGUI text, Image coinImg, float blankspaceOffset = 15.0F, bool isScaled = false)
+        public static void AlignTextAndImageFromCenter(TextMeshProUGUI text, Image img, float interval = 15.0F)
         {
-            Transform costTr = text.transform;
-            RectTransform coinTr = coinImg.rectTransform;
-            float costTextWidth = text.preferredWidth;
-            float coinImageWidth = coinTr.sizeDelta.x;
-            if (isScaled)
-            {
-                costTextWidth *= costTr.localScale.x;
-                coinImageWidth *= coinTr.localScale.x;
-            }
-            float costPosXOffset = (coinImageWidth + blankspaceOffset) * 0.5F;
-            float coinPosXOffset = -(blankspaceOffset + costTextWidth) * 0.5F;
-            costTr.localPosition = new Vector3(costPosXOffset, costTr.localPosition.y, 0.0F);
-            coinTr.localPosition = new Vector3(coinPosXOffset, coinTr.localPosition.y, 0.0F);
+            RectTransform textTr = text.GetComponent<RectTransform>();
+            RectTransform imgTr  = img.rectTransform;
+            textTr.anchorMin
+                = textTr.anchorMax
+                = imgTr.anchorMin
+                = imgTr.anchorMax
+                = new Vector2(0.5f, 0.5f);
+
+            textTr.pivot
+                = imgTr.pivot
+                = new Vector2(0.0f, 0.5f);
+
+            text.alignment = TextAlignmentOptions.MidlineLeft;
+
+            float textWidth  = text.preferredWidth;
+            float imageWidth = imgTr.rect.width;
+            textWidth  *= textTr.localScale.x;
+            imageWidth *= imgTr .localScale.x;
+
+            textTr.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, textWidth);
+
+            float sumWidth = textWidth + imageWidth + interval;
+            imgTr .anchoredPosition = new Vector2(0.0f - sumWidth * 0.5f , 0.0f);
+            textTr.anchoredPosition = new Vector2(imageWidth + interval - sumWidth * 0.5f, 0.0f);
         }
 
         public static Vector3 GetRandomXZDirection(float minDist, float maxDist)
@@ -66,7 +73,10 @@ namespace hhotLib.Common
             if (DOTween.IsTweening(target))
                 DOTween.Kill(target);
 
-            return target.DOLocalMove(target.up * amplitude, interval).SetRelative(true).SetEase(ease).SetLoops(-1, LoopType.Yoyo);
+            return target.DOLocalMove(target.up * amplitude, interval)
+                .SetRelative(true)
+                .SetEase(ease)
+                .SetLoops(-1, LoopType.Yoyo);
         }
 
         public static Tweener GetTextBlinkTween(TextMeshProUGUI target, float blinkEndVal, float duration, Ease ease = Ease.InOutSine)
@@ -77,12 +87,14 @@ namespace hhotLib.Common
             if (DOTween.IsTweening(target))
                 DOTween.Kill(target);
 
-            return target.DOFade(blinkEndVal, duration).SetLoops(-1, LoopType.Yoyo).SetEase(ease);
+            return target.DOFade(blinkEndVal, duration)
+                .SetLoops(-1, LoopType.Yoyo)
+                .SetEase(ease);
         }
 
-        public static Tween GetLensShiftTween(Camera target, Vector2 endShift, float duration = 0.5f, Ease ease = Ease.InOutSine)
+        public static Tween GetLensShiftTween(Camera target, Vector2 endShift, float duration, Ease ease = Ease.InOutSine)
         {
-            if (!target)
+            if (target == null)
                 return null;
 
             return DOTween.Sequence()
@@ -90,9 +102,9 @@ namespace hhotLib.Common
                 .SetEase(ease);
         }
 
-        public static Tween GetFOVTween(Camera target, float endVal, float duration = 0.5f, Ease ease = Ease.InOutSine)
+        public static Tween GetFOVTween(Camera target, float endVal, float duration, Ease ease = Ease.InOutSine)
         {
-            if (!target)
+            if (target == null)
                 return null;
 
             return DOTween.Sequence()
@@ -100,9 +112,9 @@ namespace hhotLib.Common
                 .SetEase(ease);
         }
 
-        public static Tween GetRotationTween(Transform target, Quaternion endVal, float duration = 0.5F, Ease ease = Ease.InOutSine)
+        public static Tween GetRotationTween(Transform target, Quaternion endVal, float duration, Ease ease = Ease.InOutSine)
         {
-            if (!target)
+            if (target == null)
                 return null;
 
             return target.DORotateQuaternion(endVal, duration)

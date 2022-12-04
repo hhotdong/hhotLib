@@ -2,6 +2,7 @@
 using UnityEditor.Build.Reporting;
 using UnityEngine;
 using UnityEditor;
+using hhotLib.Common;
 
 public class PreprocessScene : IProcessSceneWithReport
 {

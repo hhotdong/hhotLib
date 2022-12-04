@@ -1,6 +1,9 @@
 using UnityEngine;
 
-public abstract class DebugOnlyMonoBehaviour : MonoBehaviour
+namespace hhotLib.Common
 {
+    public abstract class DebugOnlyMonoBehaviour : MonoBehaviour
+    {
         
+    }
 }

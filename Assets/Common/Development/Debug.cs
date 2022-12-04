@@ -5,6 +5,7 @@ using System.Text;
 using System.IO;
 using System.Text.RegularExpressions;
 using UnityEngineInternal;
+using hhotLib.Common;
 /// 
 /// It overrides UnityEngine.Debug to mute debug messages completely on a platform-specific basis.
 /// 
