@@ -1,26 +1,16 @@
 ﻿using UnityEngine;
 
-namespace hhotLib
+namespace hhotLib.Common
 {
     [RequireComponent(typeof(RectTransform))]
     public class SafeArea : MonoBehaviour
     {
         private RectTransform panel;
-        private Rect lastSafeArea = new Rect(0, 0, 0, 0);
-
-        private void Awake()
-        {
-            panel = GetComponent<RectTransform>();
-        }
-
-        private void OnEnable()
-        {
-            Refresh();
-        }
+        private Rect          lastSafeArea = new Rect(0, 0, 0, 0);
 
         public void Refresh()
         {
-            Rect safeArea = UnityEngine.Screen.safeArea;
+            Rect safeArea = Screen.safeArea;
             if (safeArea != lastSafeArea)
             {
                 lastSafeArea = safeArea;
@@ -39,9 +29,18 @@ namespace hhotLib
             anchorMax.y /= Screen.height;
             panel.anchorMin = anchorMin;
             panel.anchorMax = anchorMax;
+            Debug.Log($"New safe area applied to {name}: x={r.x}, y={r.y}, w={r.width}, h={r.height} " +
+                $"on full extents w={Screen.width}, h={Screen.height}");
+        }
 
-            Debug.LogFormat("New safe area applied to {0}: x={1}, y={2}, w={3}, h={4} on full extents w={5}, h={6}",
-                name, r.x, r.y, r.width, r.height, Screen.width, Screen.height);
+        private void Awake()
+        {
+            panel = GetComponent<RectTransform>();
+        }
+
+        private void OnEnable()
+        {
+            Refresh();
         }
     }
 }

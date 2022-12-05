@@ -1,5 +1,4 @@
-﻿// https://stackoverflow.com/questions/58469468/what-does-unitymainthreaddispatcher-do
-
+﻿// Credit: https://stackoverflow.com/questions/58469468/what-does-unitymainthreaddispatcher-do
 using System.Threading;
 using UnityEngine;
 #if UNITY_EDITOR

@@ -1,19 +1,19 @@
-﻿// https://stackoverflow.com/questions/58469468/what-does-unitymainthreaddispatcher-do
-
+﻿// Credit: https://stackoverflow.com/questions/58469468/what-does-unitymainthreaddispatcher-do
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 
 namespace Threading.Internal
 {
-    internal struct ThreadSwitcherUnity : IThreadSwitcher
+    internal struct ThreadSwitcherTask : IThreadSwitcher
     {
         public IThreadSwitcher GetAwaiter()
         {
             return this;
         }
 
-        public bool IsCompleted => SynchronizationContext.Current == UnityThread.Context;
+        public bool IsCompleted => SynchronizationContext.Current == null;
 
         public void GetResult()
         {
@@ -24,7 +24,7 @@ namespace Threading.Internal
             if (continuation == null)
                 throw new ArgumentNullException(nameof(continuation));
 
-            UnityThread.Context.Post(s => continuation(), null);
+            Task.Run(continuation);
         }
     }
 }

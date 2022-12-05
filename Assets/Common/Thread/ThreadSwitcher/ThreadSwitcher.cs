@@ -1,16 +1,15 @@
-﻿// https://stackoverflow.com/questions/58469468/what-does-unitymainthreaddispatcher-do
-
+﻿// Credit: https://stackoverflow.com/questions/58469468/what-does-unitymainthreaddispatcher-do
 using Threading.Internal;
 
 namespace Threading
 {
     /// <summary>
-    ///     Switches to a particular thread.
+    /// Switches to a particular thread.
     /// </summary>
     public static class ThreadSwitcher
     {
         /// <summary>
-        ///     Switches to the Task thread.
+        /// Switches to the Task thread.
         /// </summary>
         /// <returns></returns>
         public static IThreadSwitcher ResumeTaskAsync()
@@ -19,7 +18,7 @@ namespace Threading
         }
 
         /// <summary>
-        ///     Switch to the Unity thread.
+        /// Switch to the Unity thread.
         /// </summary>
         /// <returns></returns>
         public static IThreadSwitcher ResumeUnityAsync()
