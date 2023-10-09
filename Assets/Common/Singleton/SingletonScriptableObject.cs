@@ -9,25 +9,25 @@ namespace hhotLib.Common
         {
             get
             {
-                T[] instances = Resources.FindObjectsOfTypeAll<T>();
-                int count = instances.Length;
-                if (count > 0)
+                if (instance != null)
+                    return instance;
+
+                string assetName = typeof(T).Name;
+                T[] assets = Resources.LoadAll<T>(assetName);
+                if (assets.Length > 1)
                 {
-                    if (count == 1)
-                        return instance = instances[0];
-
-                    Debug.LogWarning($"[{nameof(SingletonScriptableObject<T>)}] There should never be " +
-                        $"more than one {nameof(SingletonScriptableObject<T>)} in the project, " +
-                        $"but {count} were found. The first instance found will be used, and all others will be destroyed.");
-
-                    for (int i = 1; i < instances.Length; i++)
-                        DestroyImmediate(instances[i], true);
-
-                    return instance = instances[0];
+                    Debug.LogError("Found multiple " + assetName + "s on the resources folder. It is a Singleton ScriptableObject, there should only be one.");
+                    return null;
                 }
 
-                Debug.LogError($"[{nameof(SingletonScriptableObject<T>)}] An instance is needed in the project but no existing instances were found!");
-                return null;
+                if (assets.Length == 0)
+                {
+                    Debug.LogError("Could not find a " + assetName + " on the resources folder. It was created at runtime, therefore it will not be visible on the assets folder and it will not persist.");
+                    return null;
+                }
+
+                instance = assets[0];
+                return instance;
             }
         }
     }
