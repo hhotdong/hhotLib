@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace deVoid.UIFramework
 {
@@ -25,16 +26,16 @@ namespace deVoid.UIFramework
         /// </summary>
         /// <param name="instanceAndRegisterScreens">Should the screens listed in the Settings file be instanced and registered?</param>
         /// <returns>A new UI Frame</returns>
-        public UIFrame CreateUIInstance(bool instanceAndRegisterScreens = true) {
-            var newUI = Instantiate(templateUIPrefab);
-
+        public UIFrame CreateUIInstance(bool instanceAndRegisterScreens = true, bool moveToUIScene = false) {
+            UIFrame newUIFrame = Instantiate(templateUIPrefab);
+            
             if (instanceAndRegisterScreens) {
-                foreach (var screen in screensToRegister) {
-                    var screenInstance = Instantiate(screen);
+                foreach (GameObject screen in screensToRegister) {
+                    GameObject screenInstance = Instantiate(screen);
                     var screenController = screenInstance.GetComponent<IUIScreenController>();
-
+                    
                     if (screenController != null) {
-                        newUI.RegisterScreen(screen.name, screenController, screenInstance.transform);
+                        newUIFrame.RegisterScreen(screen.name, screenController, screenInstance.transform);
                         if (deactivateScreenGOs && screenInstance.activeSelf) {
                             screenInstance.SetActive(false);
                         }
@@ -45,7 +46,15 @@ namespace deVoid.UIFramework
                 }
             }
 
-            return newUI;
+            if (moveToUIScene) {
+                Scene uiScene = SceneManager.GetSceneByName("UIFramework");
+                if (uiScene.isLoaded == false) {
+                    uiScene = SceneManager.CreateScene("UIFramework");
+                }
+                SceneManager.MoveGameObjectToScene(newUIFrame.gameObject, uiScene);
+            }
+
+            return newUIFrame;
         }
         
         private void OnValidate() {

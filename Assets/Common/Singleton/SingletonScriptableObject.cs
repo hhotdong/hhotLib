@@ -9,7 +9,7 @@ namespace hhotLib.Common
         {
             get
             {
-                var instances = Resources.FindObjectsOfTypeAll<T>();
+                T[] instances = Resources.FindObjectsOfTypeAll<T>();
                 int count = instances.Length;
                 if (count > 0)
                 {

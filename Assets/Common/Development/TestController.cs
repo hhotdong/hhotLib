@@ -4,7 +4,7 @@ using UnityEngine.UI;
 using TMPro;
 
 namespace hhotLib.Common
-{ 
+{
     public class TestController : DebugOnlyMonoBehaviour
     {
         public TextMeshProUGUI text;
@@ -14,6 +14,8 @@ namespace hhotLib.Common
         {
             if (Input.GetKeyDown(KeyCode.Alpha1))
             {
+                Debug.Log($"Make UINavigation");
+                deVoid.UIFramework.UINavigation.Instance.Initialize();
             }
 
             if (Input.GetKeyDown(KeyCode.Alpha2))

@@ -9,10 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2bc6c44ff828840c58d82d1ec8f1bdfd, type: 3}
-  m_Name: UISettings
+  m_Script: {fileID: 11500000, guid: 44f98528856c645e2b739ccae5c01246, type: 3}
+  m_Name: UINavigation
   m_EditorClassIdentifier: 
-  templateUIPrefab: {fileID: 3404558194908752863, guid: 09b2a8ea38f5b43359dafc3765377cc3,
-    type: 3}
-  screensToRegister: []
-  deactivateScreenGOs: 1
+  screenCamSettings: {fileID: 11400000, guid: ab1264d03015047fbb4e81f2de959f05, type: 2}
