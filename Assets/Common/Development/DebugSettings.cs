@@ -69,13 +69,13 @@ namespace hhotLib.Common
         {
             for (int i = 0; i < constantTags.Length; i++)
             {
-                if (constantTags[i].TagName == tag && constantTags[i].ShouldDisplay)
+                if (constantTags[i].ShouldDisplay && constantTags[i].TagName.Equals(tag, StringComparison.OrdinalIgnoreCase))
                     return true;
             }
 
             for (int i = 0; i < temporaryTags.Length; i++)
             {
-                if (temporaryTags[i].TagName == tag && temporaryTags[i].ShouldDisplay)
+                if (temporaryTags[i].ShouldDisplay && temporaryTags[i].TagName.Equals(tag, StringComparison.OrdinalIgnoreCase))
                     return true;
             }
             return false;
