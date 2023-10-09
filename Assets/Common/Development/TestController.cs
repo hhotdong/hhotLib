@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -13,7 +14,6 @@ namespace hhotLib.Common
         {
             if (Input.GetKeyDown(KeyCode.Alpha1))
             {
-                Utils.AlignTextAndImageFromCenter(text, img);
             }
 
             if (Input.GetKeyDown(KeyCode.Alpha2))
