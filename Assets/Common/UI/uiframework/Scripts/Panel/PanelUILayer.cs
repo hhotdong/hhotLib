@@ -25,15 +25,21 @@ namespace deVoid.UIFramework {
         }
 
         public override void ShowScreen(IPanelController screen) {
-            screen.Show();
+            if (CanShowScreen(screen)) {
+                screen.Show();
+            }
         }
 
         public override void ShowScreen<TProps>(IPanelController screen, TProps properties) {
-            screen.Show(properties);
+            if (CanShowScreen(screen)) {
+                screen.Show(properties);
+            }
         }
 
         public override void HideScreen(IPanelController screen) {
-            screen.Hide();
+            if (CanHideScreen(screen)) {
+                screen.Hide();
+            }
         }
 
         public bool IsPanelVisible(string panelId) {

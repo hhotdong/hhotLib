@@ -22,7 +22,7 @@ namespace deVoid.UIFramework
         public event Action RequestScreenUnblock;
 
         private bool IsScreenTransitionInProgress {
-            get { return screensTransitioning.Count != 0; }
+            get { return screensTransitioning.Count > 0; }
         }
 
         private HashSet<IUIScreenController> screensTransitioning;
@@ -56,6 +56,10 @@ namespace deVoid.UIFramework
         public override void ShowScreen<TProp>(IWindowController screen, TProp properties) {
             IWindowProperties windowProp = properties as IWindowProperties;
 
+            if (CanShowScreen(screen) == false) {
+                return;
+            }
+
             if (ShouldEnqueue(screen, windowProp)) {
                 EnqueueWindow(screen, properties);
             }
@@ -66,6 +70,10 @@ namespace deVoid.UIFramework
 
         public override void HideScreen(IWindowController screen) {
             if (screen == CurrentWindow) {
+                if (CanHideScreen(screen) == false) {
+                    return;
+                }
+
                 windowHistory.Pop();
                 AddTransition(screen);
                 screen.Hide();
@@ -92,6 +100,7 @@ namespace deVoid.UIFramework
             CurrentWindow = null;
             priorityParaLayer.RefreshDarken();
             windowHistory.Clear();
+            windowQueue.Clear();
         }
 
         public override void ReparentScreen(IUIScreenController controller, Transform screenTransform) {
@@ -108,6 +117,66 @@ namespace deVoid.UIFramework
             }
 
             base.ReparentScreen(controller, screenTransform);
+        }
+
+        public void PopTo(string windowId, bool clearWindowQueue, bool shouldAnimate)
+        {
+            if (registeredScreens.TryGetValue(windowId, out IWindowController controller) == false) {
+                Debug.LogError("[WindowUILayer] Window ID " + windowId + " not registered to this layer!");
+                return;
+            }
+
+            if (CurrentWindow == null) {
+                Debug.LogWarning("[WindowUILayer] CurrentWindow is null!");
+                return;
+            }
+
+            if (CurrentWindow.ScreenId == windowId) {
+                Debug.LogWarning("[WindowUILayer] Window ID " + windowId + " is same as CurrentWindow!");
+                return;
+            }
+
+            if (CanHideScreen(CurrentWindow) == false) {
+                Debug.LogWarning("[WindowUILayer] Cannot hide CurrentWindow now!");
+                return;
+            }
+
+            bool windowExistsInStack = false;
+            foreach (WindowHistoryEntry entry in windowHistory) {
+                if (entry.Screen.ScreenId == windowId) {
+                    windowExistsInStack = true;
+                    break;
+                }
+            }
+
+            if (windowExistsInStack == false) {
+                Debug.LogWarning("[WindowUILayer] Window ID " + windowId + " doesn't exist in stack!");
+                return;
+            }
+
+            if (clearWindowQueue)
+                windowQueue.Clear();
+
+            windowHistory.Pop();
+            AddTransition(CurrentWindow);
+            CurrentWindow.Hide(shouldAnimate);
+            CurrentWindow = null;
+
+            WindowHistoryEntry history;
+            while (windowHistory.TryPeek(out history) && history.Screen.ScreenId != windowId) {
+                IWindowController screen = windowHistory.Pop().Screen;
+                if (screen.IsVisible) {
+                    screen.StopTransition();
+                    screen.Hide(false);
+                }
+            }
+
+            if (windowHistory.TryPeek(out history)) {
+                ShowPreviousInHistory();
+            }
+            else {
+                Debug.LogError("[WindowUILayer] Window ID " + windowId + " was reported to exist but not found in stack!");
+            }
         }
 
         private void EnqueueWindow<TProp>(IWindowController screen, TProp properties) where TProp : IScreenProperties {

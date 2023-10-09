@@ -3,6 +3,14 @@ using System;
 
 namespace deVoid.UIFramework
 {
+    public enum VisibleState
+    {
+        IsAppearing,
+        IsAppeared,
+        IsDisappearing,
+        IsDisappeared
+    }
+
     /// <summary>
     /// Base implementation for UI Screens. You'll probably want to inherit
     /// from one of its child classes: AWindowController or APanelController, not this.
@@ -76,7 +84,19 @@ namespace deVoid.UIFramework
         /// Is this screen currently visible?
         /// </summary>
         /// <value><c>true</c> if visible; otherwise, <c>false</c>.</value>
-        public bool IsVisible { get; private set; }
+        public bool IsVisible => visibleState == VisibleState.IsAppearing || visibleState == VisibleState.IsAppeared;
+
+        /// <summary>
+        /// Is this screen in transition state?
+        /// </summary>
+        /// <value><c>true</c> if transitioning; otherwise, <c>false</c>.</value>
+        public bool IsTransitioning => visibleState == VisibleState.IsAppearing || visibleState == VisibleState.IsDisappearing;
+
+        /// <summary>
+        /// State of visibility of screen
+        /// </summary>
+        /// <value>Visible state</value>
+        protected VisibleState visibleState = VisibleState.IsDisappeared;
 
         /// <summary>
         /// The properties of this screen. Can contain
@@ -203,11 +223,22 @@ namespace deVoid.UIFramework
             }
         }
 
-        private void DoAnimation(ATransitionComponent caller, Action callWhenFinished, bool isVisible)
+        public void StopTransition()
+        {
+            if (IsTransitioning)
+            {
+                if (visibleState == VisibleState.IsAppearing)
+                    animIn.Stop();
+                else
+                    animOut.Stop();
+            }
+        }
+
+        private void DoAnimation(ATransitionComponent caller, Action callWhenFinished, bool visible)
         {
             if (caller == null)
             {
-                gameObject.SetActive(isVisible);
+                gameObject.SetActive(visible);
                 if (callWhenFinished != null)
                 {
                     callWhenFinished();
@@ -215,7 +246,9 @@ namespace deVoid.UIFramework
             }
             else
             {
-                if (isVisible && !gameObject.activeSelf)
+                visibleState = visible ? VisibleState.IsAppearing : VisibleState.IsDisappearing;
+
+                if (visible && !gameObject.activeSelf)
                 {
                     gameObject.SetActive(true);
                 }
@@ -226,7 +259,7 @@ namespace deVoid.UIFramework
 
         private void OnTransitionInFinished()
         {
-            IsVisible = true;
+            visibleState = VisibleState.IsAppeared;
 
             if (InTransitionFinished != null)
             {
@@ -236,7 +269,8 @@ namespace deVoid.UIFramework
 
         private void OnTransitionOutFinished()
         {
-            IsVisible = false;
+            visibleState = VisibleState.IsDisappeared;
+
             gameObject.SetActive(false);
 
             if (OutTransitionFinished != null)

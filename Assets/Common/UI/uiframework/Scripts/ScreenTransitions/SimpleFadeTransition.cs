@@ -52,6 +52,17 @@ namespace deVoid.UIFramework
             shouldAnimate = true;
         }
 
+        public override void Stop()
+        {
+            if (shouldAnimate == false)
+                return;
+            shouldAnimate = false;
+            timer = 0.0f;
+            canvasGroup.alpha = endValue;
+            currentAction?.Invoke();
+            currentAction = null;
+        }
+
         private void Update() {
             if (!shouldAnimate) {
                 return;

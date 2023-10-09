@@ -7,9 +7,11 @@ namespace deVoid.UIFramework {
     public interface IUIScreenController {
         string ScreenId { get; set; }
         bool IsVisible { get; }
+        bool IsTransitioning { get; }
 
         void Show(IScreenProperties props = null);
         void Hide(bool animate = true);
+        void StopTransition();
 
         Action<IUIScreenController> InTransitionFinished { get; set; }
         Action<IUIScreenController> OutTransitionFinished { get; set; }

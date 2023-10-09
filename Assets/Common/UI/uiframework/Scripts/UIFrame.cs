@@ -125,6 +125,8 @@ namespace deVoid.UIFramework
         public void CloseCurrentWindow() {
             if (windowLayer.CurrentWindow != null) {
                 CloseWindow(windowLayer.CurrentWindow.ScreenId);    
+            } else {
+                Debug.LogWarning("Requested to close current window but current window is null!");
             }
         }
 
@@ -137,6 +139,16 @@ namespace deVoid.UIFramework
         /// <seealso cref="IWindowProperties"/>
         public void OpenWindow<T>(string screenId, T properties) where T : IWindowProperties {
             windowLayer.ShowScreenById<T>(screenId, properties);
+        }
+
+        /// <summary>
+        /// Pop Windows stack until the Window with the given id found.
+        /// </summary>
+        /// <param name="screenId">Identifier.</param>
+        /// <param name="clearWindowQueue">Whether to clear window queue.</param>
+        /// <param name="shouldAnimate">Should animate when hiding the current window.</param>
+        public void PopToWindow(string screenId, bool clearWindowQueue, bool shouldAnimate) {
+            windowLayer.PopTo(screenId, clearWindowQueue, shouldAnimate);
         }
 
         /// <summary>

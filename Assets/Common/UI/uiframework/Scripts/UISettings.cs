@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace deVoid.UIFramework
 {
@@ -26,7 +25,7 @@ namespace deVoid.UIFramework
         /// </summary>
         /// <param name="instanceAndRegisterScreens">Should the screens listed in the Settings file be instanced and registered?</param>
         /// <returns>A new UI Frame</returns>
-        public UIFrame CreateUIInstance(bool instanceAndRegisterScreens = true, bool moveToUIScene = false) {
+        public UIFrame CreateUIInstance(bool instanceAndRegisterScreens = true) {
             UIFrame newUIFrame = Instantiate(templateUIPrefab);
             
             if (instanceAndRegisterScreens) {
@@ -44,14 +43,6 @@ namespace deVoid.UIFramework
                         Debug.LogError("[UIConfig] Screen doesn't contain a ScreenController! Skipping " + screen.name);
                     }
                 }
-            }
-
-            if (moveToUIScene) {
-                Scene uiScene = SceneManager.GetSceneByName("UIFramework");
-                if (uiScene.isLoaded == false) {
-                    uiScene = SceneManager.CreateScene("UIFramework");
-                }
-                SceneManager.MoveGameObjectToScene(newUIFrame.gameObject, uiScene);
             }
 
             return newUIFrame;

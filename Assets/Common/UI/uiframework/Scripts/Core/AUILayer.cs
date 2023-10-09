@@ -134,8 +134,10 @@ namespace deVoid.UIFramework {
         /// </summary>
         /// <param name="shouldAnimateWhenHiding">Should the screen animate while hiding?</param>
         public virtual void HideAll(bool shouldAnimateWhenHiding = true) {
-            foreach (var screen in registeredScreens) {
-                screen.Value.Hide(shouldAnimateWhenHiding);
+            foreach (var kvp in registeredScreens) {
+                TScreen screen = kvp.Value;
+                screen.StopTransition();
+                screen.Hide(shouldAnimateWhenHiding);
             }
         }
 
@@ -148,6 +150,32 @@ namespace deVoid.UIFramework {
         protected virtual void ProcessScreenUnregister(string screenId, TScreen controller) {
             controller.ScreenDestroyed -= OnScreenDestroyed;
             registeredScreens.Remove(screenId);
+        }
+
+        protected bool CanShowScreen(TScreen controller) {
+            if (controller.IsTransitioning) {
+                Debug.LogWarning($"Cannot show {controller.ScreenId} because it's transitioning now!");
+                return false;
+            }
+
+            if (controller.IsVisible) {
+                Debug.LogWarning($"Cannot show {controller.ScreenId} because it's already visible!");
+                return false;
+            }
+            return true;
+        }
+
+        protected bool CanHideScreen(TScreen controller) {
+            if (controller.IsTransitioning) {
+                Debug.LogWarning($"Cannot hide {controller.ScreenId} because it's transitioning now!");
+                return false;
+            }
+
+            if (controller.IsVisible == false) {
+                Debug.LogWarning($"Cannot hide {controller.ScreenId} because it's already not visible!");
+                return false;
+            }
+            return true;
         }
 
         private void OnScreenDestroyed(IUIScreenController screen) {
