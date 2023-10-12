@@ -179,6 +179,21 @@ namespace deVoid.UIFramework
             }
         }
 
+        public override void SaveScreenContext(bool animate)
+        {
+            if (CurrentWindow != null && CurrentWindow.IsVisible) {
+                CurrentWindow.Hide(animate);
+            }
+        }
+
+        public override void RestoreScreenContext()
+        {
+            if (CurrentWindow != null && CurrentWindow.IsVisible == false
+                && windowHistory.TryPeek(out WindowHistoryEntry history) && history.Screen == CurrentWindow) {
+                history.Show();
+            }
+        }
+
         private void EnqueueWindow<TProp>(IWindowController screen, TProp properties) where TProp : IScreenProperties {
             windowQueue.Enqueue(new WindowHistoryEntry(screen, (IWindowProperties) properties));
         }

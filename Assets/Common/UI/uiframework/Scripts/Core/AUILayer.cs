@@ -30,6 +30,17 @@ namespace deVoid.UIFramework {
         public abstract void HideScreen(TScreen screen);
 
         /// <summary>
+        /// Save visible screens as context.
+        /// </summary>
+        /// <param name="animate">Should the screen animate while hiding?</param>
+        public abstract void SaveScreenContext(bool animate);
+
+        /// <summary>
+        /// Restore screen context.
+        /// </summary>
+        public abstract void RestoreScreenContext();
+
+        /// <summary>
         /// Initialize this layer
         /// </summary>
         public virtual void Initialize() {
@@ -132,12 +143,12 @@ namespace deVoid.UIFramework {
         /// <summary>
         /// Hides all screens registered to this layer
         /// </summary>
-        /// <param name="shouldAnimateWhenHiding">Should the screen animate while hiding?</param>
-        public virtual void HideAll(bool shouldAnimateWhenHiding = true) {
+        /// <param name="animate">Should the screen animate while hiding?</param>
+        public virtual void HideAll(bool animate = true) {
             foreach (var kvp in registeredScreens) {
                 TScreen screen = kvp.Value;
                 screen.StopTransition();
-                screen.Hide(shouldAnimateWhenHiding);
+                screen.Hide(animate);
             }
         }
 

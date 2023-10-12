@@ -268,7 +268,7 @@ MonoBehaviour:
   properties:
     hideOnForegroundLost: 0
     windowQueuePriority: 0
-    isPopup: 0
+    isPopup: 1
     text: 
 --- !u!114 &5186544225924160504
 MonoBehaviour:

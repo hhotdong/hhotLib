@@ -9,33 +9,68 @@ namespace hhotLib.Common
     {
         public TextMeshProUGUI text;
         public Image img;
+        public bool includePanel;
+        public bool includeWindow;
+        public bool animate;
+
+        private void Start()
+        {
+            deVoid.UIFramework.UINavigation.Instance.Initialize();
+        }
 
         private void Update()
         {
             if (Input.GetKeyDown(KeyCode.Alpha1))
             {
-                Debug.Log($"Make UINavigation");
-                deVoid.UIFramework.UINavigation.Instance.Initialize();
+                deVoid.Utils.Signals.Get<deVoid.UIFramework.ShowPanelSignal>().Dispatch("TestPanel", new deVoid.UIFramework.Examples.TestPanelProperties("TestPanel"));
             }
 
             if (Input.GetKeyDown(KeyCode.Alpha2))
             {
+                deVoid.Utils.Signals.Get<deVoid.UIFramework.HidePanelSignal>().Dispatch("TestPanel");
             }
 
             if (Input.GetKeyDown(KeyCode.Alpha3))
             {
+                deVoid.Utils.Signals.Get<deVoid.UIFramework.PushWindowSignal>().Dispatch("TestWindow", new deVoid.UIFramework.Examples.TestWindowProperties("TestWindow"));
             }
 
             if (Input.GetKeyDown(KeyCode.Alpha4))
             {
+                deVoid.Utils.Signals.Get<deVoid.UIFramework.PushWindowSignal>().Dispatch("TestWindow2", new deVoid.UIFramework.Examples.TestWindowProperties("TestWindow2"));
+            }
+
+            if (Input.GetKeyDown(KeyCode.Alpha5))
+            {
+                deVoid.Utils.Signals.Get<deVoid.UIFramework.PushWindowSignal>().Dispatch("TestWindow3", new deVoid.UIFramework.Examples.TestWindowProperties("TestWindow3"));
+            }
+
+            if (Input.GetKeyDown(KeyCode.Alpha6))
+            {
+                deVoid.Utils.Signals.Get<deVoid.UIFramework.PushWindowSignal>().Dispatch("TestPopupWindow", new deVoid.UIFramework.Examples.TestWindowProperties("TestPopupWindow"));
+            }
+
+            if (Input.GetKeyDown(KeyCode.Alpha7))
+            {
+                deVoid.Utils.Signals.Get<deVoid.UIFramework.PopWindowSignal>().Dispatch();
+            }
+
+            if (Input.GetKeyDown(KeyCode.Alpha8))
+            {
+                //deVoid.Utils.Signals.Get<deVoid.UIFramework.PopToWindowSignal>().Dispatch("TestWindow2", true, animate);
+                deVoid.Utils.Signals.Get<deVoid.UIFramework.SaveScreenContextSignal>().Dispatch(includePanel, includeWindow, animate);
+            }
+
+            if (Input.GetKeyDown(KeyCode.Alpha9))
+            {
+                //deVoid.Utils.Signals.Get<deVoid.UIFramework.PopToWindowSignal>().Dispatch("TestWindow3", true, animate);
+                deVoid.Utils.Signals.Get<deVoid.UIFramework.RestoreScreenContextSignal>().Dispatch(includePanel, includeWindow);
             }
         }
 
         private void OnGUI()
         {
-            if (GUI.Button(new Rect(0, 0, 100, 100), "Load test scene"))
-            {
-            }
+            
         }
     }
 }

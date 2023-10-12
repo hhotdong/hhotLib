@@ -146,9 +146,9 @@ namespace deVoid.UIFramework
         /// </summary>
         /// <param name="screenId">Identifier.</param>
         /// <param name="clearWindowQueue">Whether to clear window queue.</param>
-        /// <param name="shouldAnimate">Should animate when hiding the current window.</param>
-        public void PopToWindow(string screenId, bool clearWindowQueue, bool shouldAnimate) {
-            windowLayer.PopTo(screenId, clearWindowQueue, shouldAnimate);
+        /// <param name="animate">Should animate when hiding the current window.</param>
+        public void PopToWindow(string screenId, bool clearWindowQueue, bool animate) {
+            windowLayer.PopTo(screenId, clearWindowQueue, animate);
         }
 
         /// <summary>
@@ -306,6 +306,33 @@ namespace deVoid.UIFramework
 
             type = null;
             return false;
+        }
+
+        /// <summary>
+        /// Save all visible screeens as context.
+        /// </summary>
+        /// <param name="animate">Should animate when hiding the current window.</param>
+        public void SaveScreenContext(bool includePanel, bool includeWindow, bool animate) {
+            if (includePanel) {
+                panelLayer.SaveScreenContext(animate);
+            }
+
+            if (includeWindow) {
+                windowLayer.SaveScreenContext(animate);
+            }
+        }
+
+        /// <summary>
+        /// Restore saved screen context.
+        /// </summary>
+        public void RestoreScreenContext(bool includePanel, bool includeWindow) {
+            if (includePanel) {
+                panelLayer.RestoreScreenContext();
+            }
+
+            if (includeWindow) {
+                windowLayer.RestoreScreenContext();
+            }
         }
 
         private void OnRequestScreenBlock() {

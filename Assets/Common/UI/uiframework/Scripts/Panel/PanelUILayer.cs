@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace deVoid.UIFramework {
@@ -13,6 +12,8 @@ namespace deVoid.UIFramework {
         [SerializeField]
         [Tooltip("Settings for the priority para-layers. A Panel registered to this layer will be reparented to a different para-layer object depending on its Priority.")]
         private PanelPriorityLayerList priorityLayers = null;
+
+        private readonly HashSet<IPanelController> savedScreenContext = new HashSet<IPanelController>();
 
         public override void ReparentScreen(IUIScreenController controller, Transform screenTransform) {
             var ctl = controller as IPanelController;
@@ -49,6 +50,25 @@ namespace deVoid.UIFramework {
             }
 
             return false;
+        }
+
+        public override void SaveScreenContext(bool animate)
+        {
+            foreach (var item in registeredScreens) {
+                IPanelController panel = item.Value;
+                if (panel.IsVisible) {
+                    savedScreenContext.Add(panel);
+                    panel.Hide(animate);
+                }
+            }
+        }
+
+        public override void RestoreScreenContext()
+        {
+            foreach (var item in savedScreenContext) {
+                item.Show();
+            }
+            savedScreenContext.Clear();
         }
         
         private void ReparentToParaLayer(PanelPriority priority, Transform screenTransform) {
