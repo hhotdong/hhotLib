@@ -25,13 +25,32 @@ namespace deVoid.UIFramework {
             }
         }
 
+        protected override void ProcessScreenRegister(string screenId, IPanelController controller) {
+            base.ProcessScreenRegister(screenId, controller);
+            controller.CloseRequest += OnCloseRequestedByPanel;
+        }
+
+        protected override void ProcessScreenUnregister(string screenId, IPanelController controller) {
+            base.ProcessScreenUnregister(screenId, controller);
+            controller.CloseRequest -= OnCloseRequestedByPanel;
+        }
+
         public override void ShowScreen(IPanelController screen) {
-            if (CanShowScreen(screen)) {
-                screen.Show();
-            }
+            ShowScreen<IPanelProperties>(screen, null);
         }
 
         public override void ShowScreen<TProps>(IPanelController screen, TProps properties) {
+            if (screen.Priority == PanelPriority.Alert) {
+                if (screen.IsVisible) {
+                    if (screen.IsTransitioning) {
+                        screen.StopTransition();
+                    }
+                    screen.Hide(false);
+                }
+                screen.Show(properties);
+                return;
+            }
+
             if (CanShowScreen(screen)) {
                 screen.Show(properties);
             }
@@ -78,6 +97,10 @@ namespace deVoid.UIFramework {
             }
             
             screenTransform.SetParent(trans, false);
+        }
+
+        private void OnCloseRequestedByPanel(IUIScreenController screen) {
+            HideScreen(screen as IPanelController);
         }
     }
 }

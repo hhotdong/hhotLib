@@ -22,4 +22,5 @@ MonoBehaviour:
   - {fileID: 2107415519744785160, guid: f9f668ae0cbd94113868429303f8c0f5, type: 3}
   - {fileID: 3736479577608048254, guid: e21ff97a3651145d3a71e9d8eb4f36f6, type: 3}
   - {fileID: 5348024095628044387, guid: 54d80f2ac137f4716954bc214efe6fa5, type: 3}
+  - {fileID: 4303434542867233138, guid: 194ced9d5bb764906b0cb4d130846509, type: 3}
   deactivateScreenGOs: 1

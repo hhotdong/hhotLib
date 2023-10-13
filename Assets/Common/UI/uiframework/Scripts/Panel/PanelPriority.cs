@@ -11,7 +11,7 @@ namespace deVoid.UIFramework
         None = 0,
         Prioritary = 1,
         Tutorial = 2,
-        Blocker = 3,
+        Alert = 3,
     }
     
     [System.Serializable] 

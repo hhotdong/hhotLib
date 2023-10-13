@@ -14,5 +14,18 @@ namespace deVoid.UIFramework {
             get { return priority; }
             set { priority = value; }
         }
+
+        /// <summary>
+        /// When properties are passed in the Open() call, should the ones
+        /// configured in the viewPrefab be overwritten?
+        /// </summary>
+        /// <value><c>true</c> if suppress viewPrefab properties; otherwise, <c>false</c>.</value>
+        public bool SuppressPrefabProperties { get; set; }
+
+        public PanelProperties()
+        {
+            priority = PanelPriority.None;
+            SuppressPrefabProperties = false;
+        }
     }
 }

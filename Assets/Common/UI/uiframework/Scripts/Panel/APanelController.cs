@@ -19,8 +19,20 @@
             }
         }
 
+        public virtual void UI_Close() {
+            CloseRequest(this);
+        }
+
         protected sealed override void SetProperties(T props) {
-            base.SetProperties(props);
+            if (props != null) {
+                // If the Properties set on the prefab should not be overwritten,
+                // copy the default values to the passed in properties
+                if (!props.SuppressPrefabProperties) {
+                    props.Priority = Properties.Priority;
+                }
+
+                Properties = props;
+            }
         }
     }
 }

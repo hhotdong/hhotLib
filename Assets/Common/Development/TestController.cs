@@ -55,14 +55,11 @@ namespace hhotLib.Common
 
             if (Input.GetKeyDown(KeyCode.Alpha8))
             {
-                //deVoid.Utils.Signals.Get<deVoid.UIFramework.PopToWindowSignal>().Dispatch("TestWindow2", true, animate);
-                //deVoid.Utils.Signals.Get<deVoid.UIFramework.SaveScreenContextSignal>().Dispatch(includePanel, includeWindow, animate);
+                deVoid.Utils.Signals.Get<deVoid.UIFramework.ShowPanelSignal>().Dispatch("AlertPanel", new AlertPanelProperties("TestText"));
             }
 
             if (Input.GetKeyDown(KeyCode.Alpha9))
             {
-                //deVoid.Utils.Signals.Get<deVoid.UIFramework.PopToWindowSignal>().Dispatch("TestWindow3", true, animate);
-                //deVoid.Utils.Signals.Get<deVoid.UIFramework.RestoreScreenContextSignal>().Dispatch(includePanel, includeWindow);
             }
         }
 
