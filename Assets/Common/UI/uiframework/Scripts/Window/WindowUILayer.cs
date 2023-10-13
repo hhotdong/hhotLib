@@ -95,10 +95,10 @@ namespace deVoid.UIFramework
             }
         }
 
-        public override void HideAll(bool shouldAnimateWhenHiding = true) {
-            base.HideAll(shouldAnimateWhenHiding);
+        public override void HideAll(bool animate = true) {
+            base.HideAll(animate);
             CurrentWindow = null;
-            priorityParaLayer.RefreshDarken();
+            priorityParaLayer.DarkenBG(false);
             windowHistory.Clear();
             windowQueue.Clear();
         }
@@ -119,7 +119,7 @@ namespace deVoid.UIFramework
             base.ReparentScreen(controller, screenTransform);
         }
 
-        public void PopTo(string windowId, bool clearWindowQueue, bool shouldAnimate)
+        public void PopTo(string windowId, bool clearWindowQueue, bool animate)
         {
             if (registeredScreens.TryGetValue(windowId, out IWindowController controller) == false) {
                 Debug.LogError("[WindowUILayer] Window ID " + windowId + " not registered to this layer!");
@@ -159,7 +159,7 @@ namespace deVoid.UIFramework
 
             windowHistory.Pop();
             AddTransition(CurrentWindow);
-            CurrentWindow.Hide(shouldAnimate);
+            CurrentWindow.Hide(animate);
             CurrentWindow = null;
 
             WindowHistoryEntry history;
@@ -251,10 +251,6 @@ namespace deVoid.UIFramework
             windowHistory.Push(windowEntry);
             AddTransition(windowEntry.Screen);
 
-            if (windowEntry.Screen.IsPopup) {
-                priorityParaLayer.DarkenBG();
-            }
-
             windowEntry.Show();
 
             CurrentWindow = windowEntry.Screen;
@@ -266,10 +262,6 @@ namespace deVoid.UIFramework
 
         private void OnOutAnimationFinished(IUIScreenController screen) {
             RemoveTransition(screen);
-            var window = screen as IWindowController;
-            if (window.IsPopup) {
-                priorityParaLayer.RefreshDarken();
-            }
         }
 
         private void OnCloseRequestedByWindow(IUIScreenController screen) {

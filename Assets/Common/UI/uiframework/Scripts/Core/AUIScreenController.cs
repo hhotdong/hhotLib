@@ -59,9 +59,19 @@ namespace deVoid.UIFramework
         }
 
         /// <summary>
+        /// Occurs when "in" transition is started.
+        /// </summary>
+        public Action<IUIScreenController> InTransitionStarted { get; set; }
+
+        /// <summary>
         /// Occurs when "in" transition is finished.
         /// </summary>
         public Action<IUIScreenController> InTransitionFinished { get; set; }
+
+        /// <summary>
+        /// Occurs when "out" transition is started.
+        /// </summary>
+        public Action<IUIScreenController> OutTransitionStarted { get; set; }
 
         /// <summary>
         /// Occurs when "out" transition is finished.
@@ -121,7 +131,9 @@ namespace deVoid.UIFramework
                 ScreenDestroyed(this);
             }
 
+            InTransitionStarted = null;
             InTransitionFinished = null;
+            OutTransitionStarted = null;
             OutTransitionFinished = null;
             CloseRequest = null;
             ScreenDestroyed = null;
@@ -183,6 +195,11 @@ namespace deVoid.UIFramework
         /// <param name="animate">Should animation be played? (defaults to true)</param>
         public void Hide(bool animate = true)
         {
+            visibleState = VisibleState.IsDisappearing;
+            if (OutTransitionStarted != null)
+            {
+                OutTransitionStarted(this);
+            }
             DoAnimation(animate ? animOut : null, OnTransitionOutFinished, false);
             WhileHiding();
         }
@@ -210,16 +227,20 @@ namespace deVoid.UIFramework
             HierarchyFixOnShow();
             OnPropertiesSet();
 
+            visibleState = VisibleState.IsAppearing;
+
+            if (InTransitionStarted != null)
+            {
+                InTransitionStarted(this);
+            }
+
             if (!gameObject.activeSelf)
             {
                 DoAnimation(animIn, OnTransitionInFinished, true);
             }
             else
             {
-                if (InTransitionFinished != null)
-                {
-                    InTransitionFinished(this);
-                }
+                OnTransitionInFinished();
             }
         }
 
@@ -246,8 +267,6 @@ namespace deVoid.UIFramework
             }
             else
             {
-                visibleState = visible ? VisibleState.IsAppearing : VisibleState.IsDisappearing;
-
                 if (visible && !gameObject.activeSelf)
                 {
                     gameObject.SetActive(true);

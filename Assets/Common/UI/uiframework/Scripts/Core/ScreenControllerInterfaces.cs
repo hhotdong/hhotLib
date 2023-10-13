@@ -13,7 +13,9 @@ namespace deVoid.UIFramework {
         void Hide(bool animate = true);
         void StopTransition();
 
+        Action<IUIScreenController> InTransitionStarted  { get; set; }
         Action<IUIScreenController> InTransitionFinished { get; set; }
+        Action<IUIScreenController> OutTransitionStarted { get; set; }
         Action<IUIScreenController> OutTransitionFinished { get; set; }
         Action<IUIScreenController> CloseRequest { get; set; }
         Action<IUIScreenController> ScreenDestroyed { get; set; }

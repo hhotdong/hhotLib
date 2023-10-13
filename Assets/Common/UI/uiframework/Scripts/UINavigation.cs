@@ -1,10 +1,7 @@
 // Credit: https://github.com/yankooliveira/uiframework_examples
 // TODO: 현재 트랜지션중인 윈도우가 있을 때 윈도우 오픈 또는 닫으려고 하면 큐에 넣고 트랜지션 종료된 후에 실행하기 또는 매개변수에 따라 즉시 트랜지션을 종료시키고 윈도우 바로 열기(WindowLayer.ShowScreen함수에서 SuppressPrefabProperties로 예외처리?)
 // TODO: In/OutTransitionFinished 이벤트로 선언 및 트랜지션 시작/종료 시 이벤트 추가, Property로 콜백 받아오기(또는 임시적인 콜백함수 등록/해제로직 구현)
-// TODO: ForceHide 구현 여부
-// TODO: 스크립터블 트랜지션 생성
-// TODO: PopupWindow RefreshDarken, OnCloseRequestedByWindow 동작 확인
-// FIXME: 특정 윈도우가 열렸을 때 펜딩되는 이벤트 수행하는 로직 구현
+// FIXME: 특정 윈도우가 열렸을 때 펜딩되는 이벤트 수행하는 로직 구현(펜딩된 이벤트가 존재하면 해당 윈도우가 열리지 않고 펜딩된 이벤트부터 호출하기?)
 // FIXME: 뒤로가기(안드로이드 백버튼) 대응
 // FIXME: 스크린 프리팹과 아틀라스 비동기 로드
 // TEST: 동일한 팝업 윈도우 여러 번 중첩해서 큐에 대기시킬 수 있는 기능(윈도우 닫히는 시점의 이벤트 활용?)
