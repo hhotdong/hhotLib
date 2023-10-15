@@ -312,13 +312,13 @@ namespace deVoid.UIFramework
         /// Save all visible screeens as context.
         /// </summary>
         /// <param name="animate">Should animate when hiding the current window.</param>
-        public void SaveScreenContext(bool includePanel, bool includeWindow, bool animate) {
+        public void StashScreenContext(bool includePanel, bool includeWindow, bool animate) {
             if (includePanel) {
-                panelLayer.SaveScreenContext(animate);
+                panelLayer.StashScreenContext(animate);
             }
 
             if (includeWindow) {
-                windowLayer.SaveScreenContext(animate);
+                windowLayer.StashScreenContext(animate);
             }
         }
 
@@ -332,6 +332,32 @@ namespace deVoid.UIFramework
 
             if (includeWindow) {
                 windowLayer.RestoreScreenContext();
+            }
+        }
+
+        /// <summary>
+        /// Append screen transition event.
+        /// </summary>
+        public void AppendScreenTransitionEvent(string screenId, ScreenTransitionEvent transitionEvent) {
+            if (panelLayer.IsScreenRegistered(screenId)) {
+                panelLayer.AppendScreenTransitionEvent(screenId, transitionEvent);
+            } else if (windowLayer.IsScreenRegistered(screenId)) {
+                windowLayer.AppendScreenTransitionEvent(screenId, transitionEvent);
+            } else {
+                Debug.LogWarning($"Screen({screenId}) not found in both panel and window layer!");
+            }
+        }
+
+        /// <summary>
+        /// Clear screen transition event.
+        /// </summary>
+        public void ClearScreenTransitionEvent(string screenId) {
+            if (panelLayer.IsScreenRegistered(screenId)) {
+                panelLayer.ClearScreenTransitionEvent(screenId);
+            } else if (windowLayer.IsScreenRegistered(screenId)) {
+                windowLayer.ClearScreenTransitionEvent(screenId);
+            } else {
+                Debug.LogWarning($"Screen({screenId}) not found in both panel and window layer!");
             }
         }
 

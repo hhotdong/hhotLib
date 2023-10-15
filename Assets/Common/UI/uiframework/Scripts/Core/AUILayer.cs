@@ -1,13 +1,26 @@
-﻿using UnityEngine;
+﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace deVoid.UIFramework {
+    public class ScreenTransitionEvent {
+        public readonly VisibleState visibleState;
+        public readonly Action callback;
+
+        public ScreenTransitionEvent(VisibleState visibleState, Action callback) {
+            this.visibleState = visibleState;
+            this.callback = callback;
+        }
+    }
+
     /// <summary>
     /// Base class for UI Layers. Layers implement custom logic
     /// for Screen types when opening, closing etc.
     /// </summary>
     public abstract class AUILayer<TScreen> : MonoBehaviour where TScreen : IUIScreenController {
         protected Dictionary<string, TScreen> registeredScreens;
+
+        protected readonly Dictionary<string, List<ScreenTransitionEvent>> pendingTransitionEvents = new();
 
         /// <summary>
         /// Shows a screen
@@ -33,7 +46,7 @@ namespace deVoid.UIFramework {
         /// Save visible screens as context.
         /// </summary>
         /// <param name="animate">Should the screen animate while hiding?</param>
-        public abstract void SaveScreenContext(bool animate);
+        public abstract void StashScreenContext(bool animate);
 
         /// <summary>
         /// Restore screen context.
@@ -152,13 +165,42 @@ namespace deVoid.UIFramework {
             }
         }
 
+        /// <summary>
+        /// Append screen transition event.
+        /// </summary>
+        public void AppendScreenTransitionEvent(string screenId, ScreenTransitionEvent transitionEvent) {
+            if (pendingTransitionEvents.TryGetValue(screenId, out List<ScreenTransitionEvent> pendingEvents)) {
+                pendingEvents.Add(transitionEvent);
+            } else {
+                Debug.LogError($"ScreenId({screenId}) not registered for pending transition event!");
+            }
+        }
+
+        /// <summary>
+        /// Clear screen transition events.
+        /// </summary>
+        public void ClearScreenTransitionEvent(string screenId) {
+            if (pendingTransitionEvents.TryGetValue(screenId, out List<ScreenTransitionEvent> pendingEvents)) {
+                pendingEvents.Clear();
+            } else {
+                Debug.LogError($"ScreenId({screenId}) not registered for pending transition event!");
+            }
+        }
+
         protected virtual void ProcessScreenRegister(string screenId, TScreen controller) {
             controller.ScreenId = screenId;
             registeredScreens.Add(screenId, controller);
+            if (pendingTransitionEvents.TryGetValue(screenId, out List<ScreenTransitionEvent> pendingEvents) == false) {
+                pendingTransitionEvents.Add(screenId, new List<ScreenTransitionEvent>());
+            }
             controller.ScreenDestroyed += OnScreenDestroyed;
         }
 
         protected virtual void ProcessScreenUnregister(string screenId, TScreen controller) {
+            if (pendingTransitionEvents.TryGetValue(screenId, out List<ScreenTransitionEvent> pendingEvents)) {
+                pendingEvents.Clear();
+                pendingTransitionEvents.Remove(screenId);
+            }
             controller.ScreenDestroyed -= OnScreenDestroyed;
             registeredScreens.Remove(screenId);
         }
@@ -185,6 +227,17 @@ namespace deVoid.UIFramework {
                 return false;
             }
             return true;
+        }
+
+        protected void InvokePendingEvents(string screenId, VisibleState visibleState) {
+            if (pendingTransitionEvents.TryGetValue(screenId, out List<ScreenTransitionEvent> pendingEvents)) {
+                for (int i = 0; i < pendingEvents.Count; i++) {
+                    if (pendingEvents[i].visibleState != visibleState)
+                        continue;
+                    pendingEvents[i].callback?.Invoke();
+                    pendingEvents.RemoveAt(i--);
+                }
+            }
         }
 
         private void OnScreenDestroyed(IUIScreenController screen) {

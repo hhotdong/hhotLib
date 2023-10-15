@@ -35,31 +35,40 @@ namespace hhotLib.Common
 
             if (Input.GetKeyDown(KeyCode.Alpha4))
             {
-                deVoid.Utils.Signals.Get<deVoid.UIFramework.PushWindowSignal>().Dispatch("TestWindow2", new deVoid.UIFramework.Examples.TestWindowProperties("TestWindow2"));
+                deVoid.Utils.Signals.Get<deVoid.UIFramework.AppendScreenTransitionEventSignal>().Dispatch("TestPanel",
+                    new deVoid.UIFramework.ScreenTransitionEvent(deVoid.UIFramework.VisibleState.IsAppearing, () => Debug.Log($"IsAppearing TestPanel", "TEST")));
             }
 
             if (Input.GetKeyDown(KeyCode.Alpha5))
             {
-                deVoid.Utils.Signals.Get<deVoid.UIFramework.PushWindowSignal>().Dispatch("TestWindow3", new deVoid.UIFramework.Examples.TestWindowProperties("TestWindow3"));
+                deVoid.Utils.Signals.Get<deVoid.UIFramework.AppendScreenTransitionEventSignal>().Dispatch("TestPanel",
+                    new deVoid.UIFramework.ScreenTransitionEvent(deVoid.UIFramework.VisibleState.IsAppeared, () => Debug.Log($"IsAppeared TestPanel", "TEST")));
             }
 
             if (Input.GetKeyDown(KeyCode.Alpha6))
             {
-                deVoid.Utils.Signals.Get<deVoid.UIFramework.PushWindowSignal>().Dispatch("TestPopupWindow", new deVoid.UIFramework.Examples.TestWindowProperties("TestPopupWindow"));
+                deVoid.Utils.Signals.Get<deVoid.UIFramework.AppendScreenTransitionEventSignal>().Dispatch("TestPanel",
+                    new deVoid.UIFramework.ScreenTransitionEvent(deVoid.UIFramework.VisibleState.IsDisappearing, () => Debug.Log($"IsDisappearing TestPanel", "TEST")));
             }
 
             if (Input.GetKeyDown(KeyCode.Alpha7))
             {
-                deVoid.Utils.Signals.Get<deVoid.UIFramework.PopWindowSignal>().Dispatch();
+                deVoid.Utils.Signals.Get<deVoid.UIFramework.AppendScreenTransitionEventSignal>().Dispatch("TestPanel",
+                    new deVoid.UIFramework.ScreenTransitionEvent(deVoid.UIFramework.VisibleState.IsDisappeared, () => Debug.Log($"IsDisappeared TestPanel", "TEST")));
             }
 
             if (Input.GetKeyDown(KeyCode.Alpha8))
             {
-                deVoid.Utils.Signals.Get<deVoid.UIFramework.ShowPanelSignal>().Dispatch("AlertPanel", new AlertPanelProperties("TestText"));
             }
 
             if (Input.GetKeyDown(KeyCode.Alpha9))
             {
+                deVoid.Utils.Signals.Get<deVoid.UIFramework.ShowPanelSignal>().Dispatch("AlertPanel", new AlertPanelProperties("TestText"));
+            }
+
+            if (Input.GetKeyDown(KeyCode.Alpha0))
+            {
+                deVoid.Utils.Signals.Get<deVoid.UIFramework.PopWindowSignal>().Dispatch();
             }
         }
 

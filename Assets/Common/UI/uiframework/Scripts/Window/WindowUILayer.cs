@@ -37,14 +37,18 @@ namespace deVoid.UIFramework
 
         protected override void ProcessScreenRegister(string screenId, IWindowController controller) {
             base.ProcessScreenRegister(screenId, controller);
+            controller.InTransitionStarted += OnInAnimationStarted;
             controller.InTransitionFinished += OnInAnimationFinished;
+            controller.OutTransitionStarted += OnOutAnimationStarted;
             controller.OutTransitionFinished += OnOutAnimationFinished;
             controller.CloseRequest += OnCloseRequestedByWindow;
         }
 
         protected override void ProcessScreenUnregister(string screenId, IWindowController controller) {
             base.ProcessScreenUnregister(screenId, controller);
+            controller.InTransitionStarted -= OnInAnimationStarted;
             controller.InTransitionFinished -= OnInAnimationFinished;
+            controller.OutTransitionStarted -= OnOutAnimationStarted;
             controller.OutTransitionFinished -= OnOutAnimationFinished;
             controller.CloseRequest -= OnCloseRequestedByWindow;
         }
@@ -179,7 +183,7 @@ namespace deVoid.UIFramework
             }
         }
 
-        public override void SaveScreenContext(bool animate)
+        public override void StashScreenContext(bool animate)
         {
             if (CurrentWindow != null && CurrentWindow.IsVisible) {
                 CurrentWindow.Hide(animate);
@@ -255,12 +259,22 @@ namespace deVoid.UIFramework
 
             CurrentWindow = windowEntry.Screen;
         }
-        
+
+        private void OnInAnimationStarted(IUIScreenController screen) {
+            InvokePendingEvents(screen.ScreenId, VisibleState.IsAppearing);
+        }
+
         private void OnInAnimationFinished(IUIScreenController screen) {
+            InvokePendingEvents(screen.ScreenId, VisibleState.IsAppeared);
             RemoveTransition(screen);
         }
 
+        private void OnOutAnimationStarted(IUIScreenController screen) {
+            InvokePendingEvents(screen.ScreenId, VisibleState.IsDisappearing);
+        }
+
         private void OnOutAnimationFinished(IUIScreenController screen) {
+            InvokePendingEvents(screen.ScreenId, VisibleState.IsDisappeared);
             RemoveTransition(screen);
         }
 

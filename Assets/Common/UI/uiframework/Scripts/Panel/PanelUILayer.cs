@@ -13,7 +13,7 @@ namespace deVoid.UIFramework {
         [Tooltip("Settings for the priority para-layers. A Panel registered to this layer will be reparented to a different para-layer object depending on its Priority.")]
         private PanelPriorityLayerList priorityLayers = null;
 
-        private readonly HashSet<IPanelController> savedScreenContext = new HashSet<IPanelController>();
+        private readonly HashSet<IPanelController> stashedScreenContext = new HashSet<IPanelController>();
 
         public override void ReparentScreen(IUIScreenController controller, Transform screenTransform) {
             var ctl = controller as IPanelController;
@@ -27,11 +27,19 @@ namespace deVoid.UIFramework {
 
         protected override void ProcessScreenRegister(string screenId, IPanelController controller) {
             base.ProcessScreenRegister(screenId, controller);
+            controller.InTransitionStarted += OnInAnimationStarted;
+            controller.InTransitionFinished += OnInAnimationFinished;
+            controller.OutTransitionStarted += OnOutAnimationStarted;
+            controller.OutTransitionFinished += OnOutAnimationFinished;
             controller.CloseRequest += OnCloseRequestedByPanel;
         }
 
         protected override void ProcessScreenUnregister(string screenId, IPanelController controller) {
             base.ProcessScreenUnregister(screenId, controller);
+            controller.InTransitionStarted -= OnInAnimationStarted;
+            controller.InTransitionFinished -= OnInAnimationFinished;
+            controller.OutTransitionStarted -= OnOutAnimationStarted;
+            controller.OutTransitionFinished -= OnOutAnimationFinished;
             controller.CloseRequest -= OnCloseRequestedByPanel;
         }
 
@@ -70,12 +78,12 @@ namespace deVoid.UIFramework {
             return false;
         }
 
-        public override void SaveScreenContext(bool animate)
+        public override void StashScreenContext(bool animate)
         {
             foreach (var item in registeredScreens) {
                 IPanelController panel = item.Value;
                 if (panel.IsVisible) {
-                    savedScreenContext.Add(panel);
+                    stashedScreenContext.Add(panel);
                     panel.Hide(animate);
                 }
             }
@@ -83,10 +91,10 @@ namespace deVoid.UIFramework {
 
         public override void RestoreScreenContext()
         {
-            foreach (var item in savedScreenContext) {
+            foreach (var item in stashedScreenContext) {
                 item.Show();
             }
-            savedScreenContext.Clear();
+            stashedScreenContext.Clear();
         }
         
         private void ReparentToParaLayer(PanelPriority priority, Transform screenTransform) {
@@ -96,6 +104,22 @@ namespace deVoid.UIFramework {
             }
             
             screenTransform.SetParent(trans, false);
+        }
+
+        private void OnInAnimationStarted(IUIScreenController screen) {
+            InvokePendingEvents(screen.ScreenId, VisibleState.IsAppearing);
+        }
+
+        private void OnInAnimationFinished(IUIScreenController screen) {
+            InvokePendingEvents(screen.ScreenId, VisibleState.IsAppeared);
+        }
+
+        private void OnOutAnimationStarted(IUIScreenController screen) {
+            InvokePendingEvents(screen.ScreenId, VisibleState.IsDisappearing);
+        }
+
+        private void OnOutAnimationFinished(IUIScreenController screen) {
+            InvokePendingEvents(screen.ScreenId, VisibleState.IsDisappeared);
         }
 
         private void OnCloseRequestedByPanel(IUIScreenController screen) {
