@@ -10,9 +10,18 @@ namespace deVoid.UIFramework {
         [Tooltip("Panels go to different para-layers depending on their priority. You can set up para-layers in the Panel Layer.")]
         private PanelPriority priority;
 
+        [SerializeField] 
+        [Tooltip("Can reopen the panel while visible.")]
+        private bool canReopenWhileVisible;
+
         public PanelPriority Priority {
             get { return priority; }
             set { priority = value; }
+        }
+
+        public bool CanReopenWhileVisible {
+            get { return canReopenWhileVisible; }
+            set { canReopenWhileVisible = value; }
         }
 
         /// <summary>
@@ -25,6 +34,7 @@ namespace deVoid.UIFramework {
         public PanelProperties()
         {
             priority = PanelPriority.None;
+            canReopenWhileVisible = false;
             SuppressPrefabProperties = false;
         }
     }

@@ -11,6 +11,7 @@
     public interface IPanelProperties : IScreenProperties
     {
         PanelPriority Priority { get; set; }
+        bool CanReopenWhileVisible { get; set; }
         bool SuppressPrefabProperties { get; set; }
     }
 

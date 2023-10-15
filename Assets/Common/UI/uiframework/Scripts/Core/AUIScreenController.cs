@@ -61,34 +61,34 @@ namespace deVoid.UIFramework
         /// <summary>
         /// Occurs when "in" transition is started.
         /// </summary>
-        public Action<IUIScreenController> InTransitionStarted { get; set; }
+        public event Action<IUIScreenController> InTransitionStarted;
 
         /// <summary>
         /// Occurs when "in" transition is finished.
         /// </summary>
-        public Action<IUIScreenController> InTransitionFinished { get; set; }
+        public event Action<IUIScreenController> InTransitionFinished;
 
         /// <summary>
         /// Occurs when "out" transition is started.
         /// </summary>
-        public Action<IUIScreenController> OutTransitionStarted { get; set; }
+        public event Action<IUIScreenController> OutTransitionStarted;
 
         /// <summary>
         /// Occurs when "out" transition is finished.
         /// </summary>
-        public Action<IUIScreenController> OutTransitionFinished { get; set; }
+        public event Action<IUIScreenController> OutTransitionFinished;
 
         /// <summary>
         /// Screen can fire this event to request its responsible layer to close it
         /// </summary>
         /// <value>The close request.</value>
-        public Action<IUIScreenController> CloseRequest { get; set; }
+        public event Action<IUIScreenController> CloseRequest;
 
         /// <summary>
         /// If this screen is destroyed for some reason, it must warn its layer
         /// </summary>
         /// <value>The destruction action.</value>
-        public Action<IUIScreenController> ScreenDestroyed { get; set; }
+        public event Action<IUIScreenController> ScreenDestroyed;
 
         /// <summary>
         /// Is this screen currently visible?
@@ -253,6 +253,11 @@ namespace deVoid.UIFramework
                 else
                     animOut.Stop();
             }
+        }
+
+        protected void RequestClosing()
+        {
+            CloseRequest?.Invoke(this);
         }
 
         private void DoAnimation(ATransitionComponent caller, Action callWhenFinished, bool visible)

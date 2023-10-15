@@ -165,12 +165,10 @@ namespace deVoid.UIFramework {
 
         protected bool CanShowScreen(TScreen controller) {
             if (controller.IsTransitioning) {
-                Debug.LogWarning($"Cannot show {controller.ScreenId} because it's transitioning now!");
                 return false;
             }
 
             if (controller.IsVisible) {
-                Debug.LogWarning($"Cannot show {controller.ScreenId} because it's already visible!");
                 return false;
             }
             return true;

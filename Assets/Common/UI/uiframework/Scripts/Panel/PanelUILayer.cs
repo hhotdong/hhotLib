@@ -40,7 +40,9 @@ namespace deVoid.UIFramework {
         }
 
         public override void ShowScreen<TProps>(IPanelController screen, TProps properties) {
-            if (screen.Priority == PanelPriority.Alert) {
+            if (CanShowScreen(screen)) {
+                screen.Show(properties);
+            } else if (screen.CanReopenWhileVisible) {
                 if (screen.IsVisible) {
                     if (screen.IsTransitioning) {
                         screen.StopTransition();
@@ -48,11 +50,8 @@ namespace deVoid.UIFramework {
                     screen.Hide(false);
                 }
                 screen.Show(properties);
-                return;
-            }
-
-            if (CanShowScreen(screen)) {
-                screen.Show(properties);
+            } else {
+                Debug.LogWarning($"Cannot show {screen.ScreenId}! IsVisible({screen.IsVisible}), IsTransitioning({screen.IsTransitioning})");
             }
         }
 

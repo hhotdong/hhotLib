@@ -131,10 +131,8 @@ MonoBehaviour:
   animOut: {fileID: 7729695588708173782}
   properties:
     priority: 3
+    canReopenWhileVisible: 1
   messageText: {fileID: 4744036487950763177}
-  m_Padding_Width: 75
-  m_Padding_Height: 35
-  m_FixedHeight: 90
 --- !u!114 &5188106762406387826
 MonoBehaviour:
   m_ObjectHideFlags: 0

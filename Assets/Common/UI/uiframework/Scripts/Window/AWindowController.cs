@@ -35,7 +35,7 @@
         /// WhileHiding();
         /// </summary>
         public virtual void UI_Close() {
-            CloseRequest(this);
+            RequestClosing();
         }
         
         protected sealed override void SetProperties(TProps props) {

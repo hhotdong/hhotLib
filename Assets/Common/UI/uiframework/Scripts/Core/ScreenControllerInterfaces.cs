@@ -13,12 +13,12 @@ namespace deVoid.UIFramework {
         void Hide(bool animate = true);
         void StopTransition();
 
-        Action<IUIScreenController> InTransitionStarted  { get; set; }
-        Action<IUIScreenController> InTransitionFinished { get; set; }
-        Action<IUIScreenController> OutTransitionStarted { get; set; }
-        Action<IUIScreenController> OutTransitionFinished { get; set; }
-        Action<IUIScreenController> CloseRequest { get; set; }
-        Action<IUIScreenController> ScreenDestroyed { get; set; }
+        event Action<IUIScreenController> InTransitionStarted;
+        event Action<IUIScreenController> InTransitionFinished;
+        event Action<IUIScreenController> OutTransitionStarted;
+        event Action<IUIScreenController> OutTransitionFinished;
+        event Action<IUIScreenController> CloseRequest;
+        event Action<IUIScreenController> ScreenDestroyed;
     }
 
     /// <summary>
@@ -35,5 +35,6 @@ namespace deVoid.UIFramework {
     /// </summary>
     public interface IPanelController : IUIScreenController {
         PanelPriority Priority { get; }
+        bool CanReopenWhileVisible { get; }
     }
 }

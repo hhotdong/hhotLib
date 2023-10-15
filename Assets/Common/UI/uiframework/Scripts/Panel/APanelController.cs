@@ -19,8 +19,19 @@
             }
         }
 
+        public bool CanReopenWhileVisible {
+            get {
+                if (Properties != null) {
+                    return Properties.CanReopenWhileVisible;
+                }
+                else {
+                    return false;
+                }
+            }
+        }
+
         public virtual void UI_Close() {
-            CloseRequest(this);
+            RequestClosing();
         }
 
         protected sealed override void SetProperties(T props) {
@@ -29,6 +40,7 @@
                 // copy the default values to the passed in properties
                 if (!props.SuppressPrefabProperties) {
                     props.Priority = Properties.Priority;
+                    props.CanReopenWhileVisible = Properties.CanReopenWhileVisible;
                 }
 
                 Properties = props;
