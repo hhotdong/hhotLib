@@ -6,21 +6,22 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Common/MultiScenes/Scenes/Entry.unity
+    path: Assets/Scripts/Common/MultiScenes/Scenes/Entry.unity
     guid: 4752f843a3e61499f9efee0c08dc7727
   - enabled: 1
-    path: Assets/Common/MultiScenes/Scenes/Loading.unity
+    path: Assets/Scripts/Common/MultiScenes/Scenes/Loading.unity
     guid: 9afe9e3eb8407429d8762e9b230fc439
   - enabled: 1
-    path: Assets/Common/MultiScenes/Scenes/MainMenu.unity
+    path: Assets/Scripts/Common/MultiScenes/Scenes/MainMenu.unity
     guid: d60f0ef9118cc418c996f8bff8c04dfa
   - enabled: 1
-    path: Assets/Common/MultiScenes/Scenes/Debug.unity
+    path: Assets/Scripts/Common/MultiScenes/Scenes/Debug.unity
     guid: 5695ca9d52be1435abe7cf5845d807d7
   - enabled: 1
-    path: Assets/Common/MultiScenes/Scenes/Base.unity
+    path: Assets/Scripts/Common/MultiScenes/Scenes/Base.unity
     guid: 4dda969d24ffb4d299817fa68f8702e6
   - enabled: 1
-    path: Assets/Common/MultiScenes/Scenes/Battle.unity
+    path: Assets/Scripts/Common/MultiScenes/Scenes/Battle.unity
     guid: 4ac32aa82612b4a80a6a993e332555df
   m_configObjects: {}
+  m_UseUCBPForAssetBundles: 0

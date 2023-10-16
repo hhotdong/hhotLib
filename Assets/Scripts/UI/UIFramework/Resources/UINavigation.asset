@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 44f98528856c645e2b739ccae5c01246, type: 3}
   m_Name: UINavigation
   m_EditorClassIdentifier: 
-  screenCamSettings: {fileID: 11400000, guid: ab1264d03015047fbb4e81f2de959f05, type: 2}
+  _screenCamSettings: {fileID: 11400000, guid: ab1264d03015047fbb4e81f2de959f05, type: 2}
