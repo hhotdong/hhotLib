@@ -13,15 +13,7 @@ namespace hhotLib.Common.MVP
         {
             if (Application.isPlaying == false)
                 return;
-
-            try
-            {
-                NotifyBindablePropertyChanged();
-            }
-            catch (Exception e)
-            {
-                Debug.LogException(e);
-            }
+            NotifyBindablePropertyChanged();
         }
 
         /// <summary>
@@ -37,7 +29,7 @@ namespace hhotLib.Common.MVP
                     continue;
 
                 Type bindablePropertyType = bindableProperty.GetType();
-                var eventDelegate = (MulticastDelegate)bindablePropertyType.GetField("ChangeValueEvent", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(bindableProperty);
+                var eventDelegate = (MulticastDelegate)bindablePropertyType.GetField("ValueChangedEvent", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(bindableProperty);
                 if (eventDelegate != null)
                 {
                     object val = bindablePropertyType.GetField("_value", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(bindableProperty);

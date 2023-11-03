@@ -7,14 +7,15 @@ namespace hhotLib.Common.MVP.Example
     {
         /// <summary>
         /// Input event
-        /// View passes through the input event to presenter by invoking this event.
+        /// View passes through the input event to presenter by invoking this event
         /// </summary>
-        public event Action GetDamageEvent;
+        event EventHandler<DamageTakenEventArgs> DamageTakenEvent;
 
         /// <summary>
         /// Output function
-        /// Presenter calls this function to make changes for the view.
+        /// Presenter calls this function to make changes for the view
         /// </summary>
-        public void UpdateHp(int hp);
+        void UpdateHp(float hp);
+        void UpdateMaxHp(float maxHp);
     }
 }

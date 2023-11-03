@@ -4,22 +4,21 @@ namespace hhotLib.Common.MVP.Example
 {
     public class MVPTester : MonoBehaviour
     {
-        [SerializeField] private EnemyModel enemyModel;
-        [SerializeField] private GameObject viewPrefab;
+        [SerializeField] private EnemyModelBase enemyModelBase;
+        [SerializeField] private GameObject     viewPrefab;
 
         private void Start()
         {
             GameObject viewInstance = Instantiate(viewPrefab, Vector3.zero, Quaternion.identity);
             viewInstance.transform.SetParent(FindAnyObjectByType<Canvas>().transform, false);
-            IEnemyView view = viewInstance.GetComponent<EnemyView>();
-            new EnemyPresenter(view, enemyModel);
+            new EnemyPresenter(viewInstance.GetComponent<EnemyView>(), enemyModelBase, new EnemyModel());
         }
 
         private void OnGUI()
         {
-            if (GUI.Button(new Rect(0, 0, 100, 100), "Get damage"))
+            if (GUI.Button(new Rect(0, 0, 100, 100), "Take damage"))
             {
-                FindAnyObjectByType<EnemyView>().GetDamage();
+                FindAnyObjectByType<EnemyView>().TakeDamage(1.0f);
             }
         }
     }

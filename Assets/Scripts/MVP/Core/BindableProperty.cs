@@ -13,7 +13,7 @@ namespace hhotLib.Common.MVP
     public struct BindableValueProperty<T> : IBindableProperty
         where T : struct
     {
-        public event Action<T> ChangeValueEvent;
+        public event Action<T> ValueChangedEvent;
 
         public T Value
         {
@@ -26,16 +26,16 @@ namespace hhotLib.Common.MVP
                 if (_value.Equals(value))
                     return;
                 _value = value;
-                ChangeValueEvent?.Invoke(value);
+                ValueChangedEvent?.Invoke(value);
             }
         }
 
         [SerializeField] private T _value;
 
-        public void Dispose()
+        public void Reset()
         {
             _value = default;
-            ChangeValueEvent = null;
+            ValueChangedEvent = null;
         }
     }
 
@@ -43,7 +43,7 @@ namespace hhotLib.Common.MVP
     public struct BindableReferenceProperty<T> : IBindableProperty
         where T : class
     {
-        public event Action<T> ChangeValueEvent;
+        public event Action<T> ValueChangedEvent;
 
         public T Value
         {
@@ -56,16 +56,16 @@ namespace hhotLib.Common.MVP
                 if (_value != null && _value.Equals(value))
                     return;
                 _value = value;
-                ChangeValueEvent?.Invoke(value);
+                ValueChangedEvent?.Invoke(value);
             }
         }
 
         [SerializeField] private T _value;
 
-        public void Dispose()
+        public void Reset()
         {
             _value = default;
-            ChangeValueEvent = null;
+            ValueChangedEvent = null;
         }
     }
 }

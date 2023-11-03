@@ -502,7 +502,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c194130d6b3a44d698db0f11c0dd3ab7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyModel: {fileID: 11400000, guid: 6c7a1d34c41f94b8caf6573385f1a76e, type: 2}
+  enemyModelBase: {fileID: 11400000, guid: 6c7a1d34c41f94b8caf6573385f1a76e, type: 2}
   viewPrefab: {fileID: 7493941680927032765, guid: 6387a7cf850b94c7f8bf84486955e790,
     type: 3}
 --- !u!4 &1675448138
