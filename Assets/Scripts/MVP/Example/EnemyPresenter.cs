@@ -8,56 +8,56 @@ namespace hhotLib.Common.MVP.Example
     {
         // Keep references to view and models
         private IEnemyView     _view;
-        private EnemyModelBase _modelBase;
-        private EnemyModel     _modelInstance;
+        private EnemyModel     _model;
+        private EnemyStatModel _statModel;
 
-        public EnemyPresenter(IEnemyView view, EnemyModelBase modelBase, EnemyModel modelInstance)
+        public EnemyPresenter(IEnemyView view, EnemyModel model, EnemyStatModel statModel)
         {
-            _view          = view;
-            _modelBase     = modelBase;
-            _modelInstance = modelInstance;
+            _view      = view;
+            _model     = model;
+            _statModel = statModel;
 
             // Listen to input from the view
             _view.DamageTakenEvent += OnDamageTaken;
 
-            // Listen to changes in the model instance
-            _modelInstance.Hp   .ValueChangedEvent += OnHpChanged;
-            _modelInstance.MaxHp.ValueChangedEvent += OnMaxHpChanged;
+            // Listen to changes in the model
+            _model.Hp   .ValueChangedEvent += OnHpChanged;
+            _model.MaxHp.ValueChangedEvent += OnMaxHpChanged;
 
-            // Listen to changes in the model base
-            _modelBase.BaseMaxHp.ValueChangedEvent += OnBaseMaxHpChanged;
+            // Listen to changes in the stat model
+            _statModel.BaseMaxHp.ValueChangedEvent += OnBaseMaxHpChanged;
 
-            // Initialize model instance
-            _modelInstance.Hp   .Value = _modelBase.BaseMaxHp.Value;
-            _modelInstance.MaxHp.Value = _modelBase.BaseMaxHp.Value;
+            // Initialize model
+            _model.Hp   .Value = _statModel.BaseMaxHp.Value;
+            _model.MaxHp.Value = _statModel.BaseMaxHp.Value;
 
             // Set the view's initial state by synching with the model
-            _view.UpdateHp   (_modelInstance.Hp   .Value);
-            _view.UpdateMaxHp(_modelInstance.MaxHp.Value);
+            _view.UpdateHp   (_model.Hp   .Value);
+            _view.UpdateMaxHp(_model.MaxHp.Value);
         }
 
         // Called when the view gets input event
         private void OnDamageTaken(object sender, DamageTakenEventArgs args)
         {
-            _modelInstance.Hp.Value -= args.Damage;
+            _model.Hp.Value -= args.Damage;
         }
 
-        // Called when Hp property of the model instance changed
+        // Called when Hp property of the model changed
         private void OnHpChanged(float hp)
         {
             _view.UpdateHp(hp);
         }
 
-        // Called when MaxHp property of the model instance changed
+        // Called when MaxHp property of the model changed
         private void OnMaxHpChanged(float maxHp)
         {
             _view.UpdateMaxHp(maxHp);
         }
 
-        // Called when BaseMaxHp property of the model base changed
+        // Called when BaseMaxHp property of the stat model changed
         private void OnBaseMaxHpChanged(float baseMaxHp)
         {
-            _modelInstance.MaxHp.Value = baseMaxHp;
+            _model.MaxHp.Value = baseMaxHp;
         }
     }
 }

@@ -8,7 +8,7 @@ namespace hhotLib.Common.MVP.Example
     /// ModelBase class derives from ScriptablObejct
     /// </summary>
     [CreateAssetMenu(fileName = "EnemyModel", menuName = "MVP/Example/EnemyModel")]
-    public class EnemyModelBase : ScriptableObjectModel
+    public class EnemyStatModel : ScriptableObjectModel
     {
         public BindableValueProperty<float> BaseMaxHp;
         
